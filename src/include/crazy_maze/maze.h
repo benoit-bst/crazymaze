@@ -1,8 +1,9 @@
 #pragma once
 
-// Std
 #include <array>
 #include <utility>
+
+#include <termcolor/termcolor.hpp>
 
 using namespace std;
 
@@ -85,7 +86,7 @@ void maze<N, M>::print_maze()
 {
     for(size_t i = 0; i < N; ++i) {
       for(size_t j = 0; j < M; ++j) {
-          cout << _matrix[i][j];
+          cout << termcolor::magenta << _matrix[i][j];
       }
       cout << "\n";
     }
