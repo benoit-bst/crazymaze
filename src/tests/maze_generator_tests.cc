@@ -5,8 +5,8 @@
 
 using namespace cm;
 
-static const int N = 30;
-static const int M = 100;
+static const int N = 31;
+static const int M = 101;
 
 /*
   Tests maze_genrator with random square size

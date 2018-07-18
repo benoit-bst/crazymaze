@@ -10,8 +10,12 @@ using namespace std;
 
 namespace cm {
 
-static const char default_value = 35;
-static const char visited_value = 8;
+static const char default_value = 46;
+static const char visited_value = 32;
+static const char border = 35;
+static const char cross = 43;
+static const char vertical = 124;
+static const char horizontal = 45;
 
 /**
  * @brief maze
@@ -37,7 +41,11 @@ public:
 
 private:
 
-    vector<int> _direction;
+    vector<int> _directions;
+    vector<int> _dx;
+    vector<int> _dy;
+    vector<int> _ddx;
+    vector<int> _ddy;
     array<array<char, M>, N> _matrix;
     pair<uint32_t, uint32_t> _entrance;
     pair<uint32_t, uint32_t> _exit;
@@ -55,9 +63,11 @@ private:
 template<size_t N, size_t M>
 maze<N, M>::maze()
 {
-    _directions = {1,2,3,4};
-    _dx = {-1, 0, 1, 0};
-    _dy = {0, 1, 0 -1};
+    _directions = {0,1,2,3};
+    _dx = {-2, 0, 2, 0};
+    _dy = {0, 2, 0, -2};
+    _ddx = {-1, 0, 1, 0};
+    _ddy = {0, 1, 0, -1};
     _rng.seed(std::random_device()());
 }
 
@@ -81,7 +91,9 @@ void maze<N, M>::generate_random_maze()
     _entrance = {random_number(0, N), 0};
     _exit = {random_number(0, N), M};
 
-    carve_passage(random_number(0, N), random_number(0, M));
+    // carve_passage(random_number(0, N), random_number(0, M));
+    _matrix[1][1] = visited_value;
+    carve_passage(1, 1);
 }
 
 /**
@@ -92,7 +104,12 @@ void maze<N, M>::print_maze()
 {
     for(size_t i = 0; i < N; ++i) {
       for(size_t j = 0; j < M; ++j) {
-          cout << termcolor::magenta << _matrix[i][j];
+          if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
+              cout << termcolor::green << _matrix[i][j];
+          }
+          else {
+              cout << termcolor::magenta << _matrix[i][j];
+          }
       }
       cout << "\n";
     }
@@ -104,11 +121,35 @@ void maze<N, M>::print_maze()
 template<size_t N, size_t M>
 void maze<N, M>::initialize_matrix()
 {
-  for(size_t i = 0; i < N; ++i) {
-      for(size_t j = 0; j < M; ++j) {
-          _matrix[i][j] = default_value;
-      }
-  }
+    // Create border
+    for (size_t i = 0; i < N; ++i) {
+        _matrix[i][0] = border;
+        _matrix[i][M - 1] = border;
+    }
+    for (size_t i = 0; i < M; ++i) {
+        _matrix[0][i] = border;
+        _matrix[N-1][i] = border;
+    }
+
+    for(size_t i = 1; i < N - 1; ++i) {
+        for(size_t j = 1; j < M - 1; ++j) {
+
+            // Plain line
+            if (!(i % 2)) {
+                if (!(j % 2)) {
+                    _matrix[i][j] = cross;
+                } else {
+                    _matrix[i][j] = vertical;
+                }
+            } else {
+                if (j % 2) {
+                    _matrix[i][j] = default_value;
+                 } else {
+                    _matrix[i][j] = horizontal;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -141,23 +182,26 @@ uint32_t maze<N, M>::random_number(uint32_t min, uint32_t max)
 template<size_t N, size_t M>
 void maze<N, M>::carve_passage(int cx, int cy)
 {
-    // Current case is visited
-    _matrix[cx][cy] = visited_value;
-
     // Shuffle direction
     std::shuffle(_directions.begin(), _directions.end(), _rng);
 
     // For each direction
-    for (auto & dir: _directions) {
+    for (const auto & dir: _directions) {
 
-        nx = cx + ;
-        ny = cy + ;
+        uint32_t nx = cx + _dx[dir];
+        uint32_t ny = cy + _dy[dir];
 
+        uint32_t nnx = cx + _ddx[dir];
+        uint32_t nny = cy + _ddy[dir];
+
+        if ( ((nx < N) && (nx > 0)) && ((ny < M) && (ny > 0)) && (_matrix[nx][ny] == default_value) ) {
+
+            _matrix[nnx][nny] = visited_value;
+            _matrix[nx][ny] = visited_value;
+
+            carve_passage(nx, ny);
+        }
     }
-
-
-
-
 }
 
 } // namespace cm
