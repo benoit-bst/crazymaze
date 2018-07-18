@@ -53,13 +53,14 @@ private:
 
     void initialize_matrix();
     void create_random_doors();
+    std::string convert_charac(const char characters);
     uint32_t random_number(uint32_t min, uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
 
 };
 
 /**
- * @brief
+ * @brief Constructor
  */
 template<size_t N, size_t M>
 maze<N, M>::maze()
@@ -73,7 +74,7 @@ maze<N, M>::maze()
 }
 
 /**
- * @brief
+ * @brief Destructor
  */
 template<size_t N, size_t M>
 maze<N, M>::~maze()
@@ -82,7 +83,11 @@ maze<N, M>::~maze()
 }
 
 /**
- * @brief
+ * @brief generate the complete random maze
+ *
+ * 1. Default maze creation
+ * 2. Add random doors
+ * 3. backtracking algorithm to create path
  */
 template<size_t N, size_t M>
 void maze<N, M>::generate_random_maze()
@@ -96,24 +101,28 @@ void maze<N, M>::generate_random_maze()
 }
 
 /**
- * @brief
+ * @brief Print internal maze
  */
 template<size_t N, size_t M>
 void maze<N, M>::print_maze()
 {
     for(size_t i = 0; i < N; ++i) {
       for(size_t j = 0; j < M; ++j) {
+          // input
           if ((i == _entrance.first) && (j == _entrance.second)){
-              cout << termcolor::red << _matrix[i][j];
+              cout << termcolor::red << convert_charac(_matrix[i][j]);
           }
+          // ouput
           else if ((i == _exit.first) && (j == _exit.second)){
-              cout << termcolor::red << _matrix[i][j];
+              cout << termcolor::red << convert_charac(_matrix[i][j]);
           }
+          // borders
           else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
-              cout << termcolor::green << _matrix[i][j];
+              cout << termcolor::green << convert_charac(_matrix[i][j]);
           }
+          // within the maze
           else {
-              cout << termcolor::cyan << _matrix[i][j];
+              cout << termcolor::cyan << convert_charac(_matrix[i][j]);
           }
       }
       cout << "\n";
@@ -121,7 +130,30 @@ void maze<N, M>::print_maze()
 }
 
 /**
- * @brief
+ * @brief Print internal maze
+ */
+template<size_t N, size_t M>
+std::string  maze<N, M>::convert_charac(const char characters)
+{
+    switch (characters) {
+        case visited_value:
+            return " ";
+        case border:
+            return "\u2588";
+        case cross:
+            return "\u254B";
+        case vertical:
+            return "\u2503";
+        case horizontal:
+            return "\u2501";
+        default:
+            return "\u2588";
+
+    }
+}
+
+/**
+ * @brief Create full initial maze
  */
 template<size_t N, size_t M>
 void maze<N, M>::initialize_matrix()
@@ -136,6 +168,7 @@ void maze<N, M>::initialize_matrix()
         _matrix[N-1][i] = border;
     }
 
+    // Fill maze
     for(size_t i = 1; i < N - 1; ++i) {
         for(size_t j = 1; j < M - 1; ++j) {
 
@@ -158,24 +191,29 @@ void maze<N, M>::initialize_matrix()
 }
 
 /**
- * @brief
+ * @brief Create entrance and exit in the maze
  */
 template<size_t N, size_t M>
 void maze<N, M>::create_random_doors()
 {
+    // generate entrance (even)
     _entrance = {random_number(1, N-1), 0};
-    _exit = {random_number(1, N-1), M-1};
-    if (_entrance.first % 2 == 0) {
+    if (_entrance.first % 2 == 0)
         _entrance.first--;
-    }
-    if (_exit.first % 2 == 0) {
-        _exit.first--;
-    }
     _matrix[_entrance.first][_entrance.second] = 73;
+
+    // generate exit (even)
+    _exit = {random_number(1, N-1), M-1};
+    if (_exit.first % 2 == 0)
+        _exit.first--;
     _matrix[_exit.first][_exit.second] = 79;
 }
+
 /**
- * @brief
+ * @brief Random number generator
+ *
+ * @param min Minimum bound
+ * @param max Maximum boud
  */
 template<size_t N, size_t M>
 uint32_t maze<N, M>::random_number(uint32_t min, uint32_t max)
@@ -210,6 +248,7 @@ void maze<N, M>::carve_passage(int cx, int cy)
     // For each direction
     for (const auto & dir: _directions) {
 
+        // new box
         uint32_t nx = cx + _dx[dir];
         uint32_t ny = cy + _dy[dir];
 
@@ -227,3 +266,4 @@ void maze<N, M>::carve_passage(int cx, int cy)
 }
 
 } // namespace cm
+
