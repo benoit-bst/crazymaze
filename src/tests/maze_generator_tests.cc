@@ -13,6 +13,7 @@ static const int M = 101;
 */
 TEST(maze_generator_tests, multi_square_size){
 
+  // N and M have to be odd
   maze<N, M> my_maze;
 
   my_maze.generate_random_maze();

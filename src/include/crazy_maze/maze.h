@@ -52,6 +52,7 @@ private:
     std::mt19937 _rng;
 
     void initialize_matrix();
+    void create_random_doors();
     uint32_t random_number(uint32_t min, uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
 
@@ -88,10 +89,8 @@ void maze<N, M>::generate_random_maze()
 {
     initialize_matrix();
 
-    _entrance = {random_number(0, N), 0};
-    _exit = {random_number(0, N), M};
+    create_random_doors();
 
-    // carve_passage(random_number(0, N), random_number(0, M));
     _matrix[1][1] = visited_value;
     carve_passage(1, 1);
 }
@@ -104,11 +103,17 @@ void maze<N, M>::print_maze()
 {
     for(size_t i = 0; i < N; ++i) {
       for(size_t j = 0; j < M; ++j) {
-          if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
+          if ((i == _entrance.first) && (j == _entrance.second)){
+              cout << termcolor::red << _matrix[i][j];
+          }
+          else if ((i == _exit.first) && (j == _exit.second)){
+              cout << termcolor::red << _matrix[i][j];
+          }
+          else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
               cout << termcolor::green << _matrix[i][j];
           }
           else {
-              cout << termcolor::magenta << _matrix[i][j];
+              cout << termcolor::cyan << _matrix[i][j];
           }
       }
       cout << "\n";
@@ -139,19 +144,36 @@ void maze<N, M>::initialize_matrix()
                 if (!(j % 2)) {
                     _matrix[i][j] = cross;
                 } else {
-                    _matrix[i][j] = vertical;
+                    _matrix[i][j] = horizontal;
                 }
             } else {
                 if (j % 2) {
                     _matrix[i][j] = default_value;
                  } else {
-                    _matrix[i][j] = horizontal;
+                    _matrix[i][j] = vertical;
                 }
             }
         }
     }
 }
 
+/**
+ * @brief
+ */
+template<size_t N, size_t M>
+void maze<N, M>::create_random_doors()
+{
+    _entrance = {random_number(1, N-1), 0};
+    _exit = {random_number(1, N-1), M-1};
+    if (_entrance.first % 2 == 0) {
+        _entrance.first--;
+    }
+    if (_exit.first % 2 == 0) {
+        _exit.first--;
+    }
+    _matrix[_entrance.first][_entrance.second] = 73;
+    _matrix[_exit.first][_exit.second] = 79;
+}
 /**
  * @brief
  */
