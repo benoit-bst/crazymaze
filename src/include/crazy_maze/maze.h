@@ -10,8 +10,10 @@ using namespace std;
 
 namespace cm {
 
+// ascii code to represent maze
 static const char default_value = 46;
-static const char visited_value = 32;
+static const char empty_value = 32;
+static const char visited_value = 42;
 static const char border = 35;
 static const char cross = 43;
 static const char vertical = 124;
@@ -53,8 +55,8 @@ private:
 
     void initialize_matrix();
     void create_random_doors();
-    std::string convert_charac(const char characters);
-    uint32_t random_number(uint32_t min, uint32_t max);
+    std::string unicode_characters(const char characters);
+    uint32_t random_number(const uint32_t min, const uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
 
 };
@@ -96,7 +98,7 @@ void maze<N, M>::generate_random_maze()
 
     create_random_doors();
 
-    _matrix[1][1] = visited_value;
+    _matrix[1][1] = empty_value;
     carve_passage(1, 1);
 }
 
@@ -110,19 +112,19 @@ void maze<N, M>::print_maze()
       for(size_t j = 0; j < M; ++j) {
           // input
           if ((i == _entrance.first) && (j == _entrance.second)){
-              cout << termcolor::red << convert_charac(_matrix[i][j]);
+              cout << termcolor::red << unicode_characters(_matrix[i][j]);
           }
           // ouput
           else if ((i == _exit.first) && (j == _exit.second)){
-              cout << termcolor::red << convert_charac(_matrix[i][j]);
+              cout << termcolor::red << unicode_characters(_matrix[i][j]);
           }
           // borders
           else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
-              cout << termcolor::green << convert_charac(_matrix[i][j]);
+              cout << termcolor::green << unicode_characters(_matrix[i][j]);
           }
           // within the maze
           else {
-              cout << termcolor::cyan << convert_charac(_matrix[i][j]);
+              cout << termcolor::cyan << unicode_characters(_matrix[i][j]);
           }
       }
       cout << "\n";
@@ -133,10 +135,10 @@ void maze<N, M>::print_maze()
  * @brief Print internal maze
  */
 template<size_t N, size_t M>
-std::string  maze<N, M>::convert_charac(const char characters)
+std::string  maze<N, M>::unicode_characters(const char characters)
 {
     switch (characters) {
-        case visited_value:
+        case empty_value:
             return " ";
         case border:
             return "\u2588";
@@ -146,6 +148,8 @@ std::string  maze<N, M>::convert_charac(const char characters)
             return "\u2503";
         case horizontal:
             return "\u2501";
+        case visited_value:
+            return "\u25A0";
         default:
             return "\u2588";
 
@@ -216,28 +220,20 @@ void maze<N, M>::create_random_doors()
  * @param max Maximum boud
  */
 template<size_t N, size_t M>
-uint32_t maze<N, M>::random_number(uint32_t min, uint32_t max)
+uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
 {
     std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
     return dist(_rng);
 }
 
 /**
- * @brief
- * The depth-first search algorithm of maze generation is frequently implemented using backtracking:
-
-    Make the initial cell the current cell and mark it as visited
-
-    While there are unvisited cells
-
-    If the current cell has any neighbours which have not been visited
-        Choose randomly one of the unvisited neighbours
-        Push the current cell to the stack
-        Remove the wall between the current cell and the chosen cell
-        Make the chosen cell the current cell and mark it as visited
-    Else if stack is not empty
-        Pop a cell from the stack
-        Make it the current cell
+ * @brief Recursive backtracking algorithm to dig path within the maze
+ *
+ * 1. Choose a starting point in the field.
+ * 2. Randomly choose a wall at that point and carve a passage through to the adjacent cell, 
+ *     but only if the adjacent cell has not been visited yet. This becomes the new current cell.
+ * 3. If all adjacent cells have been visited, back up to the last cell that has uncarved walls and repeat.
+ * 4. The algorithm ends when the process has backed all the way up to the starting point.
  */
 template<size_t N, size_t M>
 void maze<N, M>::carve_passage(int cx, int cy)
@@ -252,13 +248,14 @@ void maze<N, M>::carve_passage(int cx, int cy)
         uint32_t nx = cx + _dx[dir];
         uint32_t ny = cy + _dy[dir];
 
+        // border
         uint32_t nnx = cx + _ddx[dir];
         uint32_t nny = cy + _ddy[dir];
 
         if ( ((nx < N) && (nx > 0)) && ((ny < M) && (ny > 0)) && (_matrix[nx][ny] == default_value) ) {
 
-            _matrix[nnx][nny] = visited_value;
-            _matrix[nx][ny] = visited_value;
+            _matrix[nnx][nny] = empty_value;
+            _matrix[nx][ny] = empty_value;
 
             carve_passage(nx, ny);
         }
