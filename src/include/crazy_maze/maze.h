@@ -21,6 +21,14 @@ static const char horizontal = 45;
 
 /**
  * @brief maze
+ *
+ *
+ * -------- y
+ * |
+ * |
+ * |
+ * |
+ * x
  */
 template<size_t N, size_t M>
 class maze
@@ -32,6 +40,11 @@ public:
     ~maze();
 
     void generate_random_maze();
+    bool find_path();
+    void clean_path();
+    void is_path();
+    pair<uint32_t, uint32_t> entrance();
+    pair<uint32_t, uint32_t> exit();
     void print_maze();
 
 
@@ -52,6 +65,7 @@ private:
     pair<uint32_t, uint32_t> _entrance;
     pair<uint32_t, uint32_t> _exit;
     std::mt19937 _rng;
+    bool _path;
 
     void initialize_matrix();
     void create_random_doors();
@@ -66,12 +80,13 @@ private:
  */
 template<size_t N, size_t M>
 maze<N, M>::maze()
+: _directions({0,1,2,3}), // N,E,S,W
+  _dx({-2, 0, 2, 0}),
+  _dy({0, 2, 0, -2}),
+  _ddx({-1, 0, 1, 0}),
+  _ddy({0, 1, 0, -1}),
+  _path(false)
 {
-    _directions = {0,1,2,3};
-    _dx = {-2, 0, 2, 0};
-    _dy = {0, 2, 0, -2};
-    _ddx = {-1, 0, 1, 0};
-    _ddy = {0, 1, 0, -1};
     _rng.seed(std::random_device()());
 }
 
@@ -94,12 +109,137 @@ maze<N, M>::~maze()
 template<size_t N, size_t M>
 void maze<N, M>::generate_random_maze()
 {
+    _path = false;
     initialize_matrix();
 
     create_random_doors();
 
+    // We start to dig at x=1 and y=1
     _matrix[1][1] = empty_value;
     carve_passage(1, 1);
+}
+
+/**
+ * @brief
+ */
+template<size_t N, size_t M>
+bool maze<N, M>::find_path()
+{
+    // Is not on valid box
+    if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) &&
+         (_matrix[_exit.first][_exit.second - 1] != empty_value) )
+        return _path = false;
+
+    // Temporary matrix for BFS
+    array<array<bool, M-2>, N-2> visited;
+    for(auto& row: visited) {
+        for(auto& val: row) val = false;
+    }
+
+    visited[_entrance.first-1][_entrance.second] = true;
+
+
+        //int BFS(int mat[][COL], Point src, Point dest)
+        //{
+        //
+        // check source and destination cell
+        // of the matrix have value 1
+        // if (!mat[src.x][src.y] || !mat[dest.x][dest.y])
+        //    return INT_MAX;
+        //
+        // bool visited[ROW][COL];
+        // memset(visited, false, sizeof visited);
+        //
+        // Mark the source cell as visited
+        // visited[src.x][src.y] = true;
+        //
+        // Create a queue for BFS
+        // queue<queueNode> q;
+        //
+        // distance of source cell is 0
+        // queueNode s = {src, 0};
+        // q.push(s);  // Enqueue source cell
+        //
+        // Do a BFS starting from source cell
+        // while (!q.empty())
+        // {
+        //     queueNode curr = q.front();
+        //     Point pt = curr.pt;
+        //
+        //      If we have reached the destination cell,
+        //      we are done
+        //      if (pt.x == dest.x && pt.y == dest.y)
+        //          return curr.dist;
+        //
+        //      Otherwise dequeue the front cell in the queue
+        //      and enqueue its adjacent cells
+        //      q.pop();
+        //
+        //      for (int i = 0; i < 4; i++)
+        //      {
+        //          int row = pt.x + rowNum[i];
+        //          int col = pt.y + colNum[i];
+        //
+        //          // if adjacent cell is valid, has path and
+        //          // not visited yet, enqueue it.
+        //          if (isValid(row, col) && mat[row][col] && !visited[row][col])
+        //          {
+        //              // mark cell as visited and enqueue it
+        //              visited[row][col] = true;
+        //              queueNode Adjcell = { {row, col},
+        //              curr.dist + 1 };
+        //              q.push(Adjcell);
+        //           }
+        //       }
+        //}
+        //
+        ////return -1 if destination cannot be reached
+        //return INT_MAX;
+        //}
+}
+
+/**
+ * @brief clean path in the maze
+ */
+template<size_t N, size_t M>
+void maze<N, M>::clean_path()
+{
+    if (_path) {
+        for (int i = 1; i < N - 1; i++) {
+            for (int j = 1; j < M - 1; j++) {
+                if (_matrix[i][j] == visited_value)
+                    _matrix[i][j] = empty_value;
+            }
+        }
+        _path = false;
+    }
+}
+
+/**
+ * @brief If path is finded
+ */
+template<size_t N, size_t M>
+void maze<N, M>::is_path()
+{
+   return  _path;
+}
+
+/**
+ * @brief Return entrance coords
+ */
+template<size_t N, size_t M>
+pair<uint32_t, uint32_t> maze<N, M>::entrance()
+{
+    return _entrance;
+}
+
+/**
+ * @brief Return exit coords
+ */
+template<size_t N, size_t M>
+pair<uint32_t, uint32_t> maze<N, M>::exit()
+{
+    return _exit;
 }
 
 /**
@@ -152,7 +292,6 @@ std::string  maze<N, M>::unicode_characters(const char characters)
             return "\u25A0";
         default:
             return "\u2588";
-
     }
 }
 
@@ -230,7 +369,7 @@ uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
  * @brief Recursive backtracking algorithm to dig path within the maze
  *
  * 1. Choose a starting point in the field.
- * 2. Randomly choose a wall at that point and carve a passage through to the adjacent cell, 
+ * 2. Randomly choose a wall at that point and carve a passage through to the adjacent cell,
  *     but only if the adjacent cell has not been visited yet. This becomes the new current cell.
  * 3. If all adjacent cells have been visited, back up to the last cell that has uncarved walls and repeat.
  * 4. The algorithm ends when the process has backed all the way up to the starting point.
