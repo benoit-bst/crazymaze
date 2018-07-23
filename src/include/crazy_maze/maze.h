@@ -12,15 +12,13 @@ using namespace std;
 namespace cm {
 
 /**
- * @brief maze
+ * @brief maze class provide methods to play with maze's algorithm
  *
  *
- * -------- y
- * |
- * |
- * |
- * |
- * x
+ *
+ *
+ *
+ *
  */
 template<size_t N, size_t M>
 class maze
@@ -32,13 +30,15 @@ public:
     ~maze();
 
     void generate_random_maze();
+
     bool find_path();
     void clean_path();
-    void is_path();
+    bool is_path();
+
     Coord entrance();
     Coord exit();
-    void print_maze();
 
+    void print_maze();
 
     maze(const maze &) = delete;
     maze& operator=(const maze &) = delete;
@@ -57,10 +57,10 @@ private:
     Coord _entrance;
     Coord _exit;
     std::mt19937 _rng;
-    bool _path;
+    bool _is_path;
 
     void initialize_matrix();
-    void create_random_doors();
+    bool create_random_doors();
     bool is_valid(const uint32_t x, const uint32_t y);
     std::string unicode_characters(const char characters);
     uint32_t random_number(const uint32_t min, const uint32_t max);
@@ -78,7 +78,7 @@ maze<N, M>::maze()
   _dy({0, 2, 0, -2}),
   _ddx({-1, 0, 1, 0}),
   _ddy({0, 1, 0, -1}),
-  _path(false)
+  _is_path(false)
 {
     _rng.seed(std::random_device()());
 }
@@ -102,14 +102,18 @@ maze<N, M>::~maze()
 template<size_t N, size_t M>
 void maze<N, M>::generate_random_maze()
 {
-    _path = false;
-    initialize_matrix();
+    _is_path = false;
+    bool is_created = false;
+    do {
+        initialize_matrix();
 
-    create_random_doors();
+        // We start to dig at x=1 and y=1
+        _matrix[1][1] = empty_value;
+        carve_passage(1, 1);
 
-    // We start to dig at x=1 and y=1
-    _matrix[1][1] = empty_value;
-    carve_passage(1, 1);
+        is_created = create_random_doors();
+
+    } while (!is_created);
 }
 
 /**
@@ -118,13 +122,8 @@ void maze<N, M>::generate_random_maze()
 template<size_t N, size_t M>
 bool maze<N, M>::find_path()
 {
-    if (_path)
+    if (_is_path)
         return true;
-
-    // Is not on valid cell
-    if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) &&
-         (_matrix[_exit.first][_exit.second - 1] != empty_value) )
-        return _path = false;
 
     // Temporary matrix for BFS
     array<array<bool, M>, N> visited{};
@@ -151,7 +150,7 @@ bool maze<N, M>::find_path()
     // Add first cell
     node s;
     s.path.push_front({_entrance.first, _entrance.second+1});
-    s.length = 0;        
+    s.length = 0;
     q.push(s);
 
     node curr;
@@ -160,9 +159,10 @@ bool maze<N, M>::find_path()
         // Current element
         curr = q.front();
         Coord pt = curr.path.back();
-        
+
         // If we have reached the destination cell,
         if (pt.first == _exit.first && pt.second == _exit.second - 1) {
+            _is_path = true;
             break;
         }
 
@@ -178,7 +178,7 @@ bool maze<N, M>::find_path()
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
             if (is_valid(x, y) && (!visited[x][y]))
-            {   
+            {
                 // mark cell as visited and enqueue it
                 visited[x][y] = true;
                 node adj_cell = {curr.path, curr.length + 1};
@@ -190,8 +190,10 @@ bool maze<N, M>::find_path()
 
     // Draw shortest path
     for (const auto& cell: curr.path) {
-        _matrix[cell.first][cell.second] = visited_value; 
+        _matrix[cell.first][cell.second] = visited_value;
     }
+
+    return _is_path;
 }
 
 /**
@@ -200,14 +202,14 @@ bool maze<N, M>::find_path()
 template<size_t N, size_t M>
 void maze<N, M>::clean_path()
 {
-    if (_path) {
-        for (int i = 1; i < N - 1; i++) {
-            for (int j = 1; j < M - 1; j++) {
+    if (_is_path) {
+        for (unsigned int i = 1; i < N - 1; i++) {
+            for (unsigned int j = 1; j < M - 1; j++) {
                 if (_matrix[i][j] == visited_value)
                     _matrix[i][j] = empty_value;
             }
         }
-        _path = false;
+        _is_path = false;
     }
 }
 
@@ -215,9 +217,9 @@ void maze<N, M>::clean_path()
  * @brief If path is finded
  */
 template<size_t N, size_t M>
-void maze<N, M>::is_path()
+bool maze<N, M>::is_path()
 {
-   return  _path;
+   return _is_path;
 }
 
 /**
@@ -333,19 +335,27 @@ void maze<N, M>::initialize_matrix()
  * @brief Create entrance and exit in the maze
  */
 template<size_t N, size_t M>
-void maze<N, M>::create_random_doors()
+bool maze<N, M>::create_random_doors()
 {
     // generate entrance (even)
     _entrance = {random_number(1, N-1), 0};
     if (_entrance.first % 2 == 0)
         _entrance.first--;
-    _matrix[_entrance.first][_entrance.second] = 73;
 
     // generate exit (even)
     _exit = {random_number(1, N-1), M-1};
     if (_exit.first % 2 == 0)
         _exit.first--;
-    _matrix[_exit.first][_exit.second] = 79;
+
+    // Is not on valid cell
+    if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) ||
+         (_matrix[_exit.first][_exit.second - 1] != empty_value) ) {
+        return false;
+    } else {
+        _matrix[_entrance.first][_entrance.second] = 73;
+        _matrix[_exit.first][_exit.second] = 79;
+        return true;
+    }
 }
 
 /**
