@@ -18,10 +18,12 @@ TEST(maze_generator_tests, print_maze){
     maze<N, M> my_maze;
 
     my_maze.random_maze();
+    // Print with ascii characters
     my_maze.print_maze();
     std::cout << "\n";
     my_maze.find_path();
-    my_maze.print_maze();
+    // Print with unicode characters
+    my_maze.print_maze(maze<N,M>::printing_type::unicode);
 }
 
 /*

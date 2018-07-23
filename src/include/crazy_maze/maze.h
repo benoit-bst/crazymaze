@@ -284,6 +284,11 @@ void maze<N, M>::print_maze(const printing_type type)
           else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
               cout << termcolor::green;
           }
+          // path
+          else if (_matrix[i][j] == visited_value){
+              cout << termcolor::yellow;
+
+          }
           // within the maze
           else {
               cout << termcolor::cyan;
