@@ -384,6 +384,9 @@ bool maze<N, M>::create_random_doors()
         _exit.first--;
 
     // Is not on valid cell
+    // It is a possible case. Backtring can create dead cell.
+    // The dead cell can be the start or the end cell.
+    // In this case you have to relaunch the carve passage
     if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) ||
          (_matrix[_exit.first][_exit.second - 1] != empty_value) ) {
         return false;

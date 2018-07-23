@@ -39,7 +39,7 @@ TEST(maze_generator_tests, repeat_generator){
 }
 
 /*
-  Tests maze_genrator with random square size
+  Repeat finding algorithm
 */
 TEST(find_path_tests, repeat_find_path){
 
@@ -56,6 +56,34 @@ TEST(find_path_tests, repeat_find_path){
             my_maze.print_maze();
         }
         my_maze.clean_path();
+    }
+}
+
+/*
+  Tests maze_genrator with random square size
+*/
+TEST(find_path_tests, find_path){
+
+    {
+        // N and M have to be odd
+        maze<N, M> my_maze;
+        my_maze.random_maze();
+        ASSERT_EQ(my_maze.is_path(), false);
+        bool is_path = my_maze.find_path();
+        ASSERT_EQ(is_path, true);
+        my_maze.clean_path();
+        ASSERT_EQ(is_path, false);
+    }
+
+    {
+        // N and M have to be odd
+        maze<N, M> my_maze;
+        my_maze.random_maze();
+        ASSERT_EQ(my_maze.is_path(), false);
+        my_maze.clean_path();
+        ASSERT_EQ(is_path, false);
+        ASSERT_EQ(my_maze.is_path(), false);
+
     }
 }
 
