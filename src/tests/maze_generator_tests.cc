@@ -11,15 +11,15 @@ static const int M = 101;
 /*
   Tests maze_generator with random square size
 */
-TEST(maze_generator_tests, multi_square_size){
+/* TEST(maze_generator_tests, multi_square_size){ */
 
-  // N and M have to be odd
-  maze<N, M> my_maze;
+/*   // N and M have to be odd */
+/*   maze<N, M> my_maze; */
 
-  my_maze.generate_random_maze();
-  my_maze.print_maze();
+/*   my_maze.generate_random_maze(); */
+/*   my_maze.print_maze(); */
 
-}
+/* } */
 /*
   Tests maze_genrator with random square size
 */
@@ -29,6 +29,7 @@ TEST(find_path_tests, multi_find_path){
   maze<N, M> my_maze;
 
   my_maze.generate_random_maze();
+  my_maze.print_maze();
   bool is_path = my_maze.find_path();
   my_maze.print_maze();
 

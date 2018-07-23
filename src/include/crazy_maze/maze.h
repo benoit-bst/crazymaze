@@ -1,23 +1,15 @@
 #pragma once
 
 #include <array>
-#include <utility>
+#include <queue>
+#include <list>
 #include <algorithm>
 
-#include <termcolor/termcolor.hpp>
+#include "common.hpp"
 
 using namespace std;
 
 namespace cm {
-
-// ascii code to represent maze
-static const char default_value = 46;
-static const char empty_value = 32;
-static const char visited_value = 42;
-static const char border = 35;
-static const char cross = 43;
-static const char vertical = 124;
-static const char horizontal = 45;
 
 /**
  * @brief maze
@@ -43,8 +35,8 @@ public:
     bool find_path();
     void clean_path();
     void is_path();
-    pair<uint32_t, uint32_t> entrance();
-    pair<uint32_t, uint32_t> exit();
+    Coord entrance();
+    Coord exit();
     void print_maze();
 
 
@@ -62,13 +54,14 @@ private:
     vector<int> _ddx;
     vector<int> _ddy;
     array<array<char, M>, N> _matrix;
-    pair<uint32_t, uint32_t> _entrance;
-    pair<uint32_t, uint32_t> _exit;
+    Coord _entrance;
+    Coord _exit;
     std::mt19937 _rng;
     bool _path;
 
     void initialize_matrix();
     void create_random_doors();
+    bool is_valid(const uint32_t x, const uint32_t y);
     std::string unicode_characters(const char characters);
     uint32_t random_number(const uint32_t min, const uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
@@ -125,77 +118,80 @@ void maze<N, M>::generate_random_maze()
 template<size_t N, size_t M>
 bool maze<N, M>::find_path()
 {
-    // Is not on valid box
+    if (_path)
+        return true;
+
+    // Is not on valid cell
     if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) &&
          (_matrix[_exit.first][_exit.second - 1] != empty_value) )
         return _path = false;
 
     // Temporary matrix for BFS
-    array<array<bool, M-2>, N-2> visited;
-    for(auto& row: visited) {
-        for(auto& val: row) val = false;
+    array<array<bool, M>, N> visited{};
+
+    // Init visited
+    for (unsigned int i = 0; i < N; ++i) {
+        for (unsigned int  j = 0; j < M; ++j) {
+            if (_matrix[i][j] != empty_value)
+                visited[i][j] = true;
+        }
     }
 
-    visited[_entrance.first-1][_entrance.second] = true;
+    // Mark the source cell as visited
+    visited[_entrance.first][_entrance.second+1] = true;
 
+    // Create queue
+    struct node {
+        list<Coord> path;
+        uint32_t length;
+    };
 
-        //int BFS(int mat[][COL], Point src, Point dest)
-        //{
-        //
-        // check source and destination cell
-        // of the matrix have value 1
-        // if (!mat[src.x][src.y] || !mat[dest.x][dest.y])
-        //    return INT_MAX;
-        //
-        // bool visited[ROW][COL];
-        // memset(visited, false, sizeof visited);
-        //
-        // Mark the source cell as visited
-        // visited[src.x][src.y] = true;
-        //
-        // Create a queue for BFS
-        // queue<queueNode> q;
-        //
-        // distance of source cell is 0
-        // queueNode s = {src, 0};
-        // q.push(s);  // Enqueue source cell
-        //
-        // Do a BFS starting from source cell
-        // while (!q.empty())
-        // {
-        //     queueNode curr = q.front();
-        //     Point pt = curr.pt;
-        //
-        //      If we have reached the destination cell,
-        //      we are done
-        //      if (pt.x == dest.x && pt.y == dest.y)
-        //          return curr.dist;
-        //
-        //      Otherwise dequeue the front cell in the queue
-        //      and enqueue its adjacent cells
-        //      q.pop();
-        //
-        //      for (int i = 0; i < 4; i++)
-        //      {
-        //          int row = pt.x + rowNum[i];
-        //          int col = pt.y + colNum[i];
-        //
-        //          // if adjacent cell is valid, has path and
-        //          // not visited yet, enqueue it.
-        //          if (isValid(row, col) && mat[row][col] && !visited[row][col])
-        //          {
-        //              // mark cell as visited and enqueue it
-        //              visited[row][col] = true;
-        //              queueNode Adjcell = { {row, col},
-        //              curr.dist + 1 };
-        //              q.push(Adjcell);
-        //           }
-        //       }
-        //}
-        //
-        ////return -1 if destination cannot be reached
-        //return INT_MAX;
-        //}
+    queue<node> q;
+
+    // Add first cell
+    node s;
+    s.path.push_front({_entrance.first, _entrance.second+1});
+    s.length = 0;        
+    q.push(s);
+
+    node curr;
+    while (!q.empty())
+    {
+        // Current element
+        curr = q.front();
+        Coord pt = curr.path.back();
+        
+        // If we have reached the destination cell,
+        if (pt.first == _exit.first && pt.second == _exit.second - 1) {
+            break;
+        }
+
+        // Otherwise dequeue the front cell in the queue
+        // and enqueue its adjacent cells
+        q.pop();
+
+        for (const auto & dir: _directions) {
+
+            uint32_t x = pt.first  + _ddx[dir];
+            uint32_t y = pt.second + _ddy[dir];
+
+            // if adjacent cell is valid, has path and
+            // not visited yet, enqueue it.
+            if (is_valid(x, y) && (!visited[x][y]))
+            {   
+                // mark cell as visited and enqueue it
+                visited[x][y] = true;
+                node adj_cell = {curr.path, curr.length + 1};
+                adj_cell.path.push_back({x, y});
+                q.push(adj_cell);
+            }
+        }
+    }
+
+    // Draw shortest path
+    for (const auto& cell: curr.path) {
+        _matrix[cell.first][cell.second] = visited_value; 
+    }
 }
 
 /**
@@ -228,7 +224,7 @@ void maze<N, M>::is_path()
  * @brief Return entrance coords
  */
 template<size_t N, size_t M>
-pair<uint32_t, uint32_t> maze<N, M>::entrance()
+Coord maze<N, M>::entrance()
 {
     return _entrance;
 }
@@ -237,7 +233,7 @@ pair<uint32_t, uint32_t> maze<N, M>::entrance()
  * @brief Return exit coords
  */
 template<size_t N, size_t M>
-pair<uint32_t, uint32_t> maze<N, M>::exit()
+Coord maze<N, M>::exit()
 {
     return _exit;
 }
@@ -289,7 +285,7 @@ std::string  maze<N, M>::unicode_characters(const char characters)
         case horizontal:
             return "\u2501";
         case visited_value:
-            return "\u25A0";
+            return "\u2588";
         default:
             return "\u2588";
     }
@@ -363,6 +359,15 @@ uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
 {
     std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
     return dist(_rng);
+}
+
+/**
+ * @brief Is a valid cell
+ */
+template<size_t N, size_t M>
+bool maze<N, M>::is_valid(const uint32_t x, const uint32_t y)
+{
+   return (x >= 0) && (x < N) && (y >= 0) && (y < M);
 }
 
 /**
