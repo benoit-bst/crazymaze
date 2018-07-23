@@ -14,10 +14,28 @@ namespace cm {
 /**
  * @brief maze class provide methods to play with maze's algorithm
  *
+ * Methods :
+ * - Backtring algorithm to create maze
+ * - Printing Maze in Raw mode or Unicode mode
+ * - Finding the shortest path with BFS algorithm
  *
+ *  @example Raw maze (10x10)
  *
+ * I : Input
+ * O : Output
+ * * : path
  *
- *
+ *  #####################
+ *  I*|     |   |       #
+ *  #*+-+ + + + +-+-+-+ #
+ *  #***| |   |*******| #
+ *  #-+*+-+-+-+*+-+-+*+ #
+ *  # |*|***|***| |***  #
+ *  # +*+*+*+*+-+ +*+-+-#
+ *  # |*|*|*|***| |*|  *O
+ *  # +*+*+*+-+*+ +*+-+*#
+ *  #  ***|*****|  *****#
+ *  #####################
  *
  */
 template<size_t N, size_t M>
@@ -26,10 +44,17 @@ class maze
 
 public:
 
+    // type of printing
+    // ascii or unicode
+    enum class printing_type {
+        ascii,
+        unicode
+    };
+
     explicit maze();
     ~maze();
 
-    void generate_random_maze();
+    void random_maze();
 
     bool find_path();
     void clean_path();
@@ -38,7 +63,7 @@ public:
     Coord entrance();
     Coord exit();
 
-    void print_maze();
+    void print_maze(const printing_type type = printing_type::ascii);
 
     maze(const maze &) = delete;
     maze& operator=(const maze &) = delete;
@@ -65,7 +90,6 @@ private:
     std::string unicode_characters(const char characters);
     uint32_t random_number(const uint32_t min, const uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
-
 };
 
 /**
@@ -96,11 +120,11 @@ maze<N, M>::~maze()
  * @brief generate the complete random maze
  *
  * 1. Default maze creation
- * 2. Add random doors
- * 3. backtracking algorithm to create path
+ * 2. backtracking algorithm to create path
+ * 3. Add random doors
  */
 template<size_t N, size_t M>
-void maze<N, M>::generate_random_maze()
+void maze<N, M>::random_maze()
 {
     _is_path = false;
     bool is_created = false;
@@ -244,26 +268,33 @@ Coord maze<N, M>::exit()
  * @brief Print internal maze
  */
 template<size_t N, size_t M>
-void maze<N, M>::print_maze()
+void maze<N, M>::print_maze(const printing_type type)
 {
     for(size_t i = 0; i < N; ++i) {
       for(size_t j = 0; j < M; ++j) {
           // input
           if ((i == _entrance.first) && (j == _entrance.second)){
-              cout << termcolor::red << unicode_characters(_matrix[i][j]);
+              cout << termcolor::red;
           }
           // ouput
           else if ((i == _exit.first) && (j == _exit.second)){
-              cout << termcolor::red << unicode_characters(_matrix[i][j]);
+              cout << termcolor::red;
           }
           // borders
           else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
-              cout << termcolor::green << unicode_characters(_matrix[i][j]);
+              cout << termcolor::green;
           }
           // within the maze
           else {
-              cout << termcolor::cyan << unicode_characters(_matrix[i][j]);
+              cout << termcolor::cyan;
           }
+          if (type == printing_type::unicode) {
+              cout << unicode_characters(_matrix[i][j]);
+          }
+          else {
+              cout << _matrix[i][j];
+          }
+
       }
       cout << "\n";
     }
@@ -279,17 +310,17 @@ std::string  maze<N, M>::unicode_characters(const char characters)
         case empty_value:
             return " ";
         case border:
-            return "\u2588";
+            return border_unicode;
         case cross:
-            return "\u254B";
+            return cross_unicode;
         case vertical:
-            return "\u2503";
+            return vertical_unicode;
         case horizontal:
-            return "\u2501";
+            return horizontal_unicode;
         case visited_value:
-            return "\u2588";
+            return visited_value_unicode;
         default:
-            return "\u2588";
+            return visited_value_unicode;
     }
 }
 
@@ -377,7 +408,7 @@ uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
 template<size_t N, size_t M>
 bool maze<N, M>::is_valid(const uint32_t x, const uint32_t y)
 {
-   return (x >= 0) && (x < N) && (y >= 0) && (y < M);
+   return (x > 0) && (x < N) && (y > 0) && (y < M);
 }
 
 /**
@@ -406,10 +437,9 @@ void maze<N, M>::carve_passage(int cx, int cy)
         uint32_t nnx = cx + _ddx[dir];
         uint32_t nny = cy + _ddy[dir];
 
-        if ( ((nx < N) && (nx > 0)) && ((ny < M) && (ny > 0)) && (_matrix[nx][ny] == default_value) ) {
+        if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
 
-            _matrix[nnx][nny] = empty_value;
-            _matrix[nx][ny] = empty_value;
+            _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
 
             carve_passage(nx, ny);
         }
