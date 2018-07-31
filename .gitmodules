@@ -1,6 +1,0 @@
-[submodule "src/maze/third_party/termcolor"]
-	path = src/maze/third_party/termcolor
-	url = https://github.com/ikalnytskyi/termcolor.git
-[submodule "src/maze/tests/gtest"]
-	path = src/maze/tests/gtest
-	url = https://github.com/google/googletest.git
