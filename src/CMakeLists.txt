@@ -7,11 +7,13 @@ SET(MAIN_SOURCES
 )
 
 # Compil flags
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++14 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++11 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -std=c++11 -Wall -Wextra")
 
 # my maze lib
 add_subdirectory(maze)
 include_directories(${maze_headers_dir})
+include_directories(${termcolor_SOURCE_DIR}/include)
 
 # Curses lib for arrow driving game
 find_package(Curses REQUIRED)

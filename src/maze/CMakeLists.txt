@@ -7,7 +7,7 @@ SET(MAZE_SOURCES
 )
 
 # Compilation Flags
-set(CRAZYMAZE_FLAGS "-std=c++14")
+set(CRAZYMAZE_FLAGS "-std=c++11")
 
 # Third party
 add_subdirectory(third_party)
