@@ -1,13 +1,27 @@
 #include <gtest/gtest.h>
 
-#include <crazy_maze/maze.h>
+#include <maze/maze.h>
 #include <random>
 
 using namespace cm;
 
-static const int NB_PASS = 400;
-static const int N = 31;
-static const int M = 101;
+static constexpr int NB_PASS = 400;
+static constexpr int N = 101;
+static constexpr int M = 31;
+
+/**
+ * @brief Random number generator
+ *
+ * @param min Minimum bound
+ * @param max Maximum boud
+ */
+uint32_t random_number(const uint32_t min, const uint32_t max)
+{
+    std::mt19937 rng;
+    rng.seed(std::random_device()());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
+    return dist(rng);
+}
 
 /*
   Printing maze
@@ -15,7 +29,7 @@ static const int M = 101;
 TEST(maze_generator_tests, print_maze){
 
     // N and M have to be odd
-    maze<N, M> my_maze;
+    maze my_maze(N, M);
 
     my_maze.random_maze();
     // Print with ascii characters
@@ -23,7 +37,7 @@ TEST(maze_generator_tests, print_maze){
     std::cout << "\n";
     my_maze.find_path();
     // Print with unicode characters
-    my_maze.print_maze(maze<N,M>::printing_type::unicode);
+    my_maze.print_maze(maze::printing_type::unicode);
 }
 
 /*
@@ -31,9 +45,16 @@ TEST(maze_generator_tests, print_maze){
 */
 TEST(maze_generator_tests, repeat_generator){
 
-    // N and M have to be odd
     for (int i = 0; i < NB_PASS; ++i) {
-        maze<N, M> my_maze;
+
+        // N and M have to be odd
+        uint N = random_number(5, 100);
+        if (N % 2 == 0)
+            N--;
+        uint M = random_number(5, 100);
+        if (M % 2 == 0)
+            M--;
+        maze my_maze(N, M);
         my_maze.random_maze();
     }
 }
@@ -43,11 +64,16 @@ TEST(maze_generator_tests, repeat_generator){
 */
 TEST(find_path_tests, repeat_find_path){
 
-    // N and M have to be odd
-    maze<N, M> my_maze;
-
     for (int i = 0; i < NB_PASS; ++i) {
 
+        // N and M have to be odd
+        uint N = random_number(5, 100);
+        if (N % 2 == 0)
+            N--;
+        uint M = random_number(5, 100);
+        if (M % 2 == 0)
+            M--;
+        maze my_maze(N, M);
         my_maze.random_maze();
         ASSERT_EQ(my_maze.is_path(), false);
         bool is_path = my_maze.find_path();
@@ -60,28 +86,27 @@ TEST(find_path_tests, repeat_find_path){
 }
 
 /*
-  Tests maze_genrator with random square size
+  find_path tests
 */
 TEST(find_path_tests, find_path){
 
     {
         // N and M have to be odd
-        maze<N, M> my_maze;
+        maze my_maze(N, M);
         my_maze.random_maze();
         ASSERT_EQ(my_maze.is_path(), false);
         bool is_path = my_maze.find_path();
         ASSERT_EQ(is_path, true);
         my_maze.clean_path();
-        ASSERT_EQ(is_path, false);
+        ASSERT_EQ(my_maze.is_path(), false);
     }
 
     {
         // N and M have to be odd
-        maze<N, M> my_maze;
+        maze my_maze(N, M);
         my_maze.random_maze();
         ASSERT_EQ(my_maze.is_path(), false);
         my_maze.clean_path();
-        ASSERT_EQ(is_path, false);
         ASSERT_EQ(my_maze.is_path(), false);
 
     }

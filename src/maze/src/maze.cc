@@ -1,117 +1,38 @@
-#pragma once
+#include <maze/maze.h>
 
 #include <array>
-#include <queue>
-#include <list>
-#include <algorithm>
-
-#include "common.hpp"
-
-using namespace std;
 
 namespace cm {
 
 /**
- * @brief maze class provide methods to play with maze's algorithm
- *
- * Methods :
- * - Backtring algorithm to create maze
- * - Printing Maze in Raw mode or Unicode mode
- * - Finding the shortest path with BFS algorithm
- *
- *  @example Raw maze (10x10)
- *
- * I : Input
- * O : Output
- * * : path
- *
- *  #####################
- *  I*|     |   |       #
- *  #*+-+ + + + +-+-+-+ #
- *  #***| |   |*******| #
- *  #-+*+-+-+-+*+-+-+*+ #
- *  # |*|***|***| |***  #
- *  # +*+*+*+*+-+ +*+-+-#
- *  # |*|*|*|***| |*|  *O
- *  # +*+*+*+-+*+ +*+-+*#
- *  #  ***|*****|  *****#
- *  #####################
- *
- */
-template<size_t N, size_t M>
-class maze
-{
-
-public:
-
-    // type of printing
-    // ascii or unicode
-    enum class printing_type {
-        ascii,
-        unicode
-    };
-
-    explicit maze();
-    ~maze();
-
-    void random_maze();
-
-    bool find_path();
-    void clean_path();
-    bool is_path();
-
-    Coord entrance();
-    Coord exit();
-
-    void print_maze(const printing_type type = printing_type::ascii);
-
-    maze(const maze &) = delete;
-    maze& operator=(const maze &) = delete;
-
-    maze(maze&& other) = delete;
-    maze& operator=(maze&& other) = delete;
-
-private:
-
-    vector<int> _directions;
-    vector<int> _dx;
-    vector<int> _dy;
-    vector<int> _ddx;
-    vector<int> _ddy;
-    array<array<char, M>, N> _matrix;
-    Coord _entrance;
-    Coord _exit;
-    std::mt19937 _rng;
-    bool _is_path;
-
-    void initialize_matrix();
-    bool create_random_doors();
-    bool is_valid(const uint32_t x, const uint32_t y);
-    std::string unicode_characters(const char characters);
-    uint32_t random_number(const uint32_t min, const uint32_t max);
-    void carve_passage(int cx = 0, int cy = 0);
-};
-
-/**
  * @brief Constructor
  */
-template<size_t N, size_t M>
-maze<N, M>::maze()
+maze::maze(const uint32_t width, const uint32_t height)
 : _directions({0,1,2,3}), // N,E,S,W
   _dx({-2, 0, 2, 0}),
   _dy({0, 2, 0, -2}),
   _ddx({-1, 0, 1, 0}),
   _ddy({0, 1, 0, -1}),
+  _width(width),
+  _height(height),
   _is_path(false)
 {
     _rng.seed(std::random_device()());
+
+    // matrix alloc
+    _matrix.resize(height);
+    _visited.resize(height);
+    for (uint i = 0; i < _matrix.size(); ++i)
+    {
+      _matrix[i].resize(width);
+      _visited[i].resize(width);
+    }
 }
 
 /**
  * @brief Destructor
  */
-template<size_t N, size_t M>
-maze<N, M>::~maze()
+maze::~maze()
 {
 
 }
@@ -123,8 +44,7 @@ maze<N, M>::~maze()
  * 2. backtracking algorithm to create path
  * 3. Add random doors
  */
-template<size_t N, size_t M>
-void maze<N, M>::random_maze()
+void maze::random_maze()
 {
     _is_path = false;
     bool is_created = false;
@@ -143,25 +63,21 @@ void maze<N, M>::random_maze()
 /**
  * @brief
  */
-template<size_t N, size_t M>
-bool maze<N, M>::find_path()
+bool maze::find_path()
 {
     if (_is_path)
         return true;
 
-    // Temporary matrix for BFS
-    array<array<bool, M>, N> visited{};
-
     // Init visited
-    for (unsigned int i = 0; i < N; ++i) {
-        for (unsigned int  j = 0; j < M; ++j) {
+    for (unsigned int i = 0; i < _height; ++i) {
+        for (unsigned int  j = 0; j < _width; ++j) {
             if (_matrix[i][j] != empty_value)
-                visited[i][j] = true;
+                _visited[i][j] = true;
         }
     }
 
     // Mark the source cell as visited
-    visited[_entrance.first][_entrance.second+1] = true;
+    _visited[_entrance.first][_entrance.second+1] = true;
 
     // Create queue
     struct node {
@@ -201,10 +117,10 @@ bool maze<N, M>::find_path()
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
-            if (is_valid(x, y) && (!visited[x][y]))
+            if (is_valid(x, y) && (!_visited[x][y]))
             {
                 // mark cell as visited and enqueue it
-                visited[x][y] = true;
+                _visited[x][y] = true;
                 node adj_cell = {curr.path, curr.length + 1};
                 adj_cell.path.push_back({x, y});
                 q.push(adj_cell);
@@ -212,7 +128,7 @@ bool maze<N, M>::find_path()
         }
     }
 
-    // Draw shortest path
+    // Draw shortest path_height
     for (const auto& cell: curr.path) {
         _matrix[cell.first][cell.second] = visited_value;
     }
@@ -223,12 +139,11 @@ bool maze<N, M>::find_path()
 /**
  * @brief clean path in the maze
  */
-template<size_t N, size_t M>
-void maze<N, M>::clean_path()
+void maze::clean_path()
 {
     if (_is_path) {
-        for (unsigned int i = 1; i < N - 1; i++) {
-            for (unsigned int j = 1; j < M - 1; j++) {
+        for (unsigned int i = 1; i < _height - 1; i++) {
+            for (unsigned int j = 1; j < _width - 1; j++) {
                 if (_matrix[i][j] == visited_value)
                     _matrix[i][j] = empty_value;
             }
@@ -240,8 +155,7 @@ void maze<N, M>::clean_path()
 /**
  * @brief If path is finded
  */
-template<size_t N, size_t M>
-bool maze<N, M>::is_path()
+bool maze::is_path()
 {
    return _is_path;
 }
@@ -249,8 +163,7 @@ bool maze<N, M>::is_path()
 /**
  * @brief Return entrance coords
  */
-template<size_t N, size_t M>
-Coord maze<N, M>::entrance()
+Coord maze::entrance()
 {
     return _entrance;
 }
@@ -258,20 +171,34 @@ Coord maze<N, M>::entrance()
 /**
  * @brief Return exit coords
  */
-template<size_t N, size_t M>
-Coord maze<N, M>::exit()
+Coord maze::exit()
 {
     return _exit;
 }
 
 /**
+ * @brief Return entrance coords
+ */
+uint32_t maze::maze_width()
+{
+    return _width;
+}
+
+/**
+ * @brief Return exit coords
+ */
+uint32_t maze::maze_height()
+{
+    return _height;
+}
+
+/**
  * @brief Print internal maze
  */
-template<size_t N, size_t M>
-void maze<N, M>::print_maze(const printing_type type)
+void maze::print_maze(const printing_type type)
 {
-    for(size_t i = 0; i < N; ++i) {
-      for(size_t j = 0; j < M; ++j) {
+    for(size_t i = 0; i < _height; ++i) {
+      for(size_t j = 0; j < _width; ++j) {
           // input
           if ((i == _entrance.first) && (j == _entrance.second)){
               cout << termcolor::red;
@@ -281,7 +208,7 @@ void maze<N, M>::print_maze(const printing_type type)
               cout << termcolor::red;
           }
           // borders
-          else if ((i == 0) || (j == 0) || (i == N-1) || (j == M-1)) {
+          else if ((i == 0) || (j == 0) || (i == _height-1) || (j == _width-1)) {
               cout << termcolor::green;
           }
           // path
@@ -308,8 +235,7 @@ void maze<N, M>::print_maze(const printing_type type)
 /**
  * @brief Print internal maze
  */
-template<size_t N, size_t M>
-std::string  maze<N, M>::unicode_characters(const char characters)
+std::string  maze::unicode_characters(const char characters)
 {
     switch (characters) {
         case empty_value:
@@ -332,23 +258,26 @@ std::string  maze<N, M>::unicode_characters(const char characters)
 /**
  * @brief Create full initial maze
  */
-template<size_t N, size_t M>
-void maze<N, M>::initialize_matrix()
+void maze::initialize_matrix()
 {
     // Create border
-    for (size_t i = 0; i < N; ++i) {
+    for (size_t i = 0; i < _height; ++i) {
         _matrix[i][0] = border;
-        _matrix[i][M - 1] = border;
+        _matrix[i][_width - 1] = border;
     }
-    for (size_t i = 0; i < M; ++i) {
+    for (size_t i = 0; i < _width; ++i) {
         _matrix[0][i] = border;
-        _matrix[N-1][i] = border;
+        _matrix[_height - 1][i] = border;
     }
 
     // Fill maze
-    for(size_t i = 1; i < N - 1; ++i) {
-        for(size_t j = 1; j < M - 1; ++j) {
+    for(size_t i = 1; i < _height - 1; ++i) {
+        for(size_t j = 1; j < _width - 1; ++j) {
 
+            // Border
+            /* if ((i == 0) || (j == 0) || (i == _width -1) || (j = _height -1)) { */
+                /* _matrix[i][j] = border; */
+            /* } */
             // Plain line
             if (!(i % 2)) {
                 if (!(j % 2)) {
@@ -363,6 +292,8 @@ void maze<N, M>::initialize_matrix()
                     _matrix[i][j] = vertical;
                 }
             }
+
+            _visited[i][j] = false;
         }
     }
 }
@@ -370,16 +301,15 @@ void maze<N, M>::initialize_matrix()
 /**
  * @brief Create entrance and exit in the maze
  */
-template<size_t N, size_t M>
-bool maze<N, M>::create_random_doors()
+bool maze::create_random_doors()
 {
     // generate entrance (even)
-    _entrance = {random_number(1, N-1), 0};
+    _entrance = {random_number(1, _height-1), 0};
     if (_entrance.first % 2 == 0)
         _entrance.first--;
 
     // generate exit (even)
-    _exit = {random_number(1, N-1), M-1};
+    _exit = {random_number(1, _height-1), _width-1};
     if (_exit.first % 2 == 0)
         _exit.first--;
 
@@ -403,8 +333,7 @@ bool maze<N, M>::create_random_doors()
  * @param min Minimum bound
  * @param max Maximum boud
  */
-template<size_t N, size_t M>
-uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
+uint32_t maze::random_number(const uint32_t min, const uint32_t max)
 {
     std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
     return dist(_rng);
@@ -413,10 +342,9 @@ uint32_t maze<N, M>::random_number(const uint32_t min, const uint32_t max)
 /**
  * @brief Is a valid cell
  */
-template<size_t N, size_t M>
-bool maze<N, M>::is_valid(const uint32_t x, const uint32_t y)
+bool maze::is_valid(const uint32_t x, const uint32_t y)
 {
-   return (x > 0) && (x < N) && (y > 0) && (y < M);
+   return (x > 0) && (x < _height) && (y > 0) && (y < _width);
 }
 
 /**
@@ -428,8 +356,7 @@ bool maze<N, M>::is_valid(const uint32_t x, const uint32_t y)
  * 3. If all adjacent cells have been visited, back up to the last cell that has uncarved walls and repeat.
  * 4. The algorithm ends when the process has backed all the way up to the starting point.
  */
-template<size_t N, size_t M>
-void maze<N, M>::carve_passage(int cx, int cy)
+void maze::carve_passage(int cx, int cy)
 {
     // Shuffle direction
     std::shuffle(_directions.begin(), _directions.end(), _rng);
@@ -455,4 +382,3 @@ void maze<N, M>::carve_passage(int cx, int cy)
 }
 
 } // namespace cm
-

@@ -1,6 +1,6 @@
 if(ENABLE_TESTING)
 
-    MESSAGE(STATUS  "[crazymaze] Compile tests")
+    MESSAGE(STATUS  "[maze] Compile tests")
 
     set(COVERAGE OFF CACHE BOOL "Coverage")
 
@@ -12,7 +12,7 @@ if(ENABLE_TESTING)
     set(CRAZYMAZE_TEST_FLAGS "-O3 -std=c++14 -Wall -Wextra")
 
     # ThreadPool tests
-    add_executable(maze_generator_tests maze_generator_tests.cc)
+    add_executable(maze_generator_tests maze_generator_tests.cc ${maze_SOURCE_DIR}/${MAZE_SOURCES})
     target_link_libraries(maze_generator_tests PRIVATE gtest ${CMAKE_THREAD_LIBS_INIT})
     set_target_properties(maze_generator_tests PROPERTIES COMPILE_FLAGS ${CRAZYMAZE_TEST_FLAGS})
 
@@ -22,3 +22,4 @@ if(ENABLE_TESTING)
     endif()
 
 endif()
+

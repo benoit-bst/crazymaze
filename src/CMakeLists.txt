@@ -2,16 +2,21 @@ cmake_minimum_required(VERSION 3.2)
 
 project(crazymaze)
 
-# Path for include
-set(crazymaze_headers_dir ${crazymaze_SOURCE_DIR}/include CACHE STRING "crazymaze headers dir")
-include_directories( ${crazymaze_SOURCE_DIR}/include )
+SET(MAIN_SOURCES
+    main.cc
+)
 
-# Third party
-add_subdirectory(third_party)
-include_directories(${termcolor_SOURCE_DIR}/include)
+# Compil flags
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++14 -Wall -Wextra")
 
-add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE "${crazymaze_SOURCE_DIR}/include")
+# my maze lib
+add_subdirectory(maze)
+include_directories(${maze_headers_dir})
 
-#Tests
-add_subdirectory(tests)
+# Curses lib for arrow driving game
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
+
+# Bin
+add_executable(${PROJECT_NAME} ${MAIN_SOURCES} ${CURSES_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${CURSES_LIBRARIES})
