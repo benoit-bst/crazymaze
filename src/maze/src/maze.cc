@@ -1,6 +1,6 @@
 #include <maze/maze.h>
 
-#include <array>
+#include <cassert>
 
 namespace cm {
 
@@ -17,7 +17,8 @@ maze::maze(const uint32_t width, const uint32_t height)
   _height(height),
   _is_path(false)
 {
-    _rng.seed(std::random_device()());
+    assert((width % 2) != 0 && "width need to be odd");
+    assert((height % 2) != 0 && "height need to be odd");
 
     // matrix alloc
     _matrix.resize(height);
@@ -52,8 +53,14 @@ void maze::random_maze()
         initialize_matrix();
 
         // We start to dig at x=1 and y=1
-        _matrix[1][1] = empty_value;
-        carve_passage(1, 1);
+        uint32_t start_x = common::random_number(2, _height-1);
+        if (start_x % 2 == 0)
+            start_x--;
+        uint32_t start_y = common::random_number(2, _width-1);
+        if (start_y % 2 == 0)
+            start_y--;
+        _matrix[start_x][start_y] = empty_value;
+        carve_passage(start_x,start_y);
 
         is_created = create_random_doors();
 
@@ -221,7 +228,7 @@ void maze::print_maze(const printing_type type)
               cout << termcolor::cyan;
           }
           if (type == printing_type::unicode) {
-              cout << unicode_characters(_matrix[i][j]);
+              cout << common::unicode_characters(_matrix[i][j]);
           }
           else {
               cout << _matrix[i][j];
@@ -233,26 +240,11 @@ void maze::print_maze(const printing_type type)
 }
 
 /**
- * @brief Print internal maze
+ * @brief return the maze char matrix
  */
-std::string  maze::unicode_characters(const char characters)
+vector<vector<char>>& maze::matrix()
 {
-    switch (characters) {
-        case empty_value:
-            return " ";
-        case border:
-            return border_unicode;
-        case cross:
-            return cross_unicode;
-        case vertical:
-            return vertical_unicode;
-        case horizontal:
-            return horizontal_unicode;
-        case visited_value:
-            return visited_value_unicode;
-        default:
-            return visited_value_unicode;
-    }
+    return _matrix;
 }
 
 /**
@@ -304,12 +296,12 @@ void maze::initialize_matrix()
 bool maze::create_random_doors()
 {
     // generate entrance (even)
-    _entrance = {random_number(1, _height-1), 0};
+    _entrance = {common::random_number(1, _height-1), 0};
     if (_entrance.first % 2 == 0)
         _entrance.first--;
 
     // generate exit (even)
-    _exit = {random_number(1, _height-1), _width-1};
+    _exit = {common::random_number(1, _height-1), _width-1};
     if (_exit.first % 2 == 0)
         _exit.first--;
 
@@ -325,18 +317,6 @@ bool maze::create_random_doors()
         _matrix[_exit.first][_exit.second] = 79;
         return true;
     }
-}
-
-/**
- * @brief Random number generator
- *
- * @param min Minimum bound
- * @param max Maximum boud
- */
-uint32_t maze::random_number(const uint32_t min, const uint32_t max)
-{
-    std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
-    return dist(_rng);
 }
 
 /**
@@ -359,12 +339,14 @@ bool maze::is_valid(const uint32_t x, const uint32_t y)
 void maze::carve_passage(int cx, int cy)
 {
     // Shuffle direction
-    std::shuffle(_directions.begin(), _directions.end(), _rng);
+    std::mt19937 rng;
+    rng.seed(std::random_device()());
+    std::shuffle(_directions.begin(), _directions.end(), rng);
 
     // For each direction
     for (const auto & dir: _directions) {
 
-        // new box
+        // new cell
         uint32_t nx = cx + _dx[dir];
         uint32_t ny = cy + _dy[dir];
 

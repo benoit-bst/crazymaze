@@ -9,20 +9,6 @@ static constexpr int NB_PASS = 400;
 static constexpr int N = 101;
 static constexpr int M = 31;
 
-/**
- * @brief Random number generator
- *
- * @param min Minimum bound
- * @param max Maximum boud
- */
-uint32_t random_number(const uint32_t min, const uint32_t max)
-{
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(min,max);
-    return dist(rng);
-}
-
 /*
   Printing maze
 */
@@ -48,10 +34,10 @@ TEST(maze_generator_tests, repeat_generator){
     for (int i = 0; i < NB_PASS; ++i) {
 
         // N and M have to be odd
-        uint N = random_number(5, 100);
+        uint N = common::random_number(5, 100);
         if (N % 2 == 0)
             N--;
-        uint M = random_number(5, 100);
+        uint M = common::random_number(5, 100);
         if (M % 2 == 0)
             M--;
         maze my_maze(N, M);
@@ -67,10 +53,10 @@ TEST(find_path_tests, repeat_find_path){
     for (int i = 0; i < NB_PASS; ++i) {
 
         // N and M have to be odd
-        uint N = random_number(5, 100);
+        uint N = common::random_number(5, 100);
         if (N % 2 == 0)
             N--;
-        uint M = random_number(5, 100);
+        uint M = common::random_number(5, 100);
         if (M % 2 == 0)
             M--;
         maze my_maze(N, M);

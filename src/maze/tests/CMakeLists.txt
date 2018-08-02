@@ -9,11 +9,11 @@ if(ENABLE_TESTING)
     find_package (Threads)
 
     # Compilation Flags
-    set(CRAZYMAZE_TEST_FLAGS "-O3 -std=c++14 -Wall -Wextra")
+    set(CRAZYMAZE_TEST_FLAGS "-O3 -std=c++11 -Wall -Wextra")
 
     # ThreadPool tests
-    add_executable(maze_generator_tests maze_generator_tests.cc ${maze_SOURCE_DIR}/${MAZE_SOURCES})
-    target_link_libraries(maze_generator_tests PRIVATE gtest ${CMAKE_THREAD_LIBS_INIT})
+    add_executable(maze_generator_tests maze_generator_tests.cc)
+    target_link_libraries(maze_generator_tests PRIVATE gtest maze ${CMAKE_THREAD_LIBS_INIT})
     set_target_properties(maze_generator_tests PROPERTIES COMPILE_FLAGS ${CRAZYMAZE_TEST_FLAGS})
 
     if (COVERAGE)

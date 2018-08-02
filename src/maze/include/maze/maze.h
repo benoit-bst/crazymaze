@@ -5,7 +5,7 @@
 #include <list>
 #include <algorithm>
 
-#include "common.hpp"
+#include "common.h"
 
 using namespace std;
 
@@ -66,6 +66,7 @@ public:
     uint32_t maze_height();
 
     void print_maze(const printing_type type = printing_type::ascii);
+    vector<vector<char>>& matrix();
 
     maze(const maze &) = delete;
     maze& operator=(const maze &) = delete;
@@ -89,14 +90,11 @@ private:
 
     Coord _entrance;
     Coord _exit;
-    std::mt19937 _rng;
     bool _is_path;
 
     void initialize_matrix();
     bool create_random_doors();
     bool is_valid(const uint32_t x, const uint32_t y);
-    std::string unicode_characters(const char characters);
-    uint32_t random_number(const uint32_t min, const uint32_t max);
     void carve_passage(int cx = 0, int cy = 0);
 };
 

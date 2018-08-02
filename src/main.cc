@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <iostream>
 #include <unistd.h>  /* only for sleep() */
 
 #include <maze/maze.h>
@@ -20,22 +21,43 @@ int kbhit(void)
 
 int main(void)
 {
-    /* WINDOW* boite; */
+    //[> WINDOW* boite; <]
     initscr(); // Init WINDOW struct
 
-    /* int N = 0; */
-    /* int M = 0; */
-    /* if (COLS % 2 == 0) */
-    /*     N = COLS - 1; */
-    /* if (LINES % 2 == 0) */
-    /*     M = LINES - 1; */
-    /* const int val = M; */
-    /* maze<100,val> my_maze; */
+    int N = COLS;
+    int M = LINES;
+    if (N  % 2 == 0)
+        N--;
+    if (M % 2 == 0)
+        M--;
 
-    /* my_maze.random_maze(); */
-    /* // Print with ascii characters */
-    /* my_maze.print_maze(); */
 
+    //cout << "COLS " << COLS << endl;
+    //cout << "LINES " << LINES << endl;
+    //cout << "N " << N << endl;
+    //cout << "M " << M << endl;
+    //printw("COLS %d\n", COLS);
+    //printw("LINES %d\n", LINES);
+    //printw("N %d\n", N);
+    //printw("M %d\n", M);
+
+    maze my_maze(N,M);
+
+    //my_maze.random_maze();
+    // Print with ascii characters
+
+    my_maze.random_maze();
+    my_maze.find_path();
+    auto mat = my_maze.matrix();
+    for (int i = 0; i < mat.size();  ++i) {
+        for (int j = 0; j < mat[i].size();  ++j) {
+            printw("%c", mat[i][j]);
+        }
+        printw("\n");
+    }
+    refresh();
+    getch();
+    endwin();
 
     /* printw("Term size x %d - y %d\n", LINES, COLS); */
 
@@ -53,22 +75,21 @@ int main(void)
 
     /* return 0; */
 
-    cbreak();
-    noecho();
-    nodelay(stdscr, TRUE);
+    //cbreak();
+    //noecho();
+    //nodelay(stdscr, TRUE);
 
-    scrollok(stdscr, TRUE);
-    while (1) {
-        if (kbhit()) {
-            printw("Key pressed! It was: %d\n", getch());
-            refresh();
-        } else {
-            /* printw("No key pressed yet...\n"); */
-            refresh();
-            usleep(100);
-        }
-    }
-    endwin();
+    //scrollok(stdscr, TRUE);
+    //while (1) {
+        //if (kbhit()) {
+            //printw("Key pressed! It was: %d\n", getch());
+            //refresh();
+        //} else {
+             //printw("No key pressed yet...\n");
+            //refresh();
+            //usleep(100);
+        //}
+    //}
     return 0;
 }
 

@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.2)
 
 project(maze)
 
-SET(MAZE_SOURCES
+set(MAZE_SOURCES
     src/maze.cc
+    src/common.cc
 )
 
 # Compilation Flags
@@ -14,10 +15,10 @@ add_subdirectory(third_party)
 include_directories(${termcolor_SOURCE_DIR}/include)
 
 # Path for include
-set(maze_headers_dir ${maze_SOURCE_DIR}/include CACHE STRING "maze headers dir")
+set(maze_header_dir ${maze_SOURCE_DIR}/include CACHE STRING "maze headers dir")
 include_directories( ${maze_SOURCE_DIR}/include )
 
-set(MAZE_LIBRARIES ${maze_SOURCE_DIR}/${MAZE_SOURCES} CACHE STRING "maze headers dir")
+set(MAZE_LIBRARIES ${maze_SOURCE_DIR}/${MAZE_SOURCES} CACHE STRING "add in executable")
 
 # my maze lib
 add_library(${PROJECT_NAME} STATIC ${MAZE_SOURCES})
