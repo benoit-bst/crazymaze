@@ -42,25 +42,29 @@ maze::~maze()
  * @brief generate the complete random maze
  *
  * 1. Default maze creation
- * 2. backtracking algorithm to create path
- * 3. Add random doors
+ * 2. Add random doors
+ * 3. Backtracking algorithm to create path
+ *    - Recursive Backtracking Algorithm
+ *    - Dethp-First Search Algorithm
  */
-void maze::random_maze()
+void maze::random_maze(const dig_maze_algorithm dma)
 {
     _is_path = false;
     bool is_created = false;
     do {
         initialize_matrix();
 
-        // We start to dig at x=1 and y=1
+        // We start to dig at random (x,y) position
         uint32_t start_x = common::random_number(2, _height-1);
         if (start_x % 2 == 0)
             start_x--;
         uint32_t start_y = common::random_number(2, _width-1);
         if (start_y % 2 == 0)
             start_y--;
+
+        // Dig maze wih selected algorithm
         _matrix[start_x][start_y] = empty_value;
-        carve_passage(start_x,start_y);
+        dig_maze(start_x, start_y, dma);
 
         is_created = create_random_doors();
 
@@ -68,7 +72,7 @@ void maze::random_maze()
 }
 
 /**
- * @brief
+ * @brief Find shortest path with depth-first search algorithm
  */
 bool maze::find_path()
 {
@@ -266,10 +270,6 @@ void maze::initialize_matrix()
     for(size_t i = 1; i < _height - 1; ++i) {
         for(size_t j = 1; j < _width - 1; ++j) {
 
-            // Border
-            /* if ((i == 0) || (j == 0) || (i == _width -1) || (j = _height -1)) { */
-                /* _matrix[i][j] = border; */
-            /* } */
             // Plain line
             if (!(i % 2)) {
                 if (!(j % 2)) {
@@ -328,6 +328,33 @@ bool maze::is_valid(const uint32_t x, const uint32_t y)
 }
 
 /**
+ * @brief Dig maze algorithm
+ */
+void maze::dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_maze_algorithm dma)
+{
+    switch (dma) {
+        case dig_maze_algorithm::RBA:
+            recursive_backtracking_algorithm(start_x, start_y);
+            break;
+        case dig_maze_algorithm::DFSA:
+            recursive_backtracking_algorithm(start_x, start_y);
+            break;
+        default:
+            recursive_backtracking_algorithm(start_x, start_y);
+
+    }
+}
+
+/**
+ *
+ *
+ */
+void maze::deep_first_search_algorithm(int x, int y)
+{
+
+}
+
+/**
  * @brief Recursive backtracking algorithm to dig path within the maze
  *
  * 1. Choose a starting point in the field.
@@ -336,7 +363,7 @@ bool maze::is_valid(const uint32_t x, const uint32_t y)
  * 3. If all adjacent cells have been visited, back up to the last cell that has uncarved walls and repeat.
  * 4. The algorithm ends when the process has backed all the way up to the starting point.
  */
-void maze::carve_passage(int cx, int cy)
+void maze::recursive_backtracking_algorithm(int x, int y)
 {
     // Shuffle direction
     std::mt19937 rng;
@@ -347,18 +374,18 @@ void maze::carve_passage(int cx, int cy)
     for (const auto & dir: _directions) {
 
         // new cell
-        uint32_t nx = cx + _dx[dir];
-        uint32_t ny = cy + _dy[dir];
+        uint32_t nx = x + _dx[dir];
+        uint32_t ny = y + _dy[dir];
 
         // border
-        uint32_t nnx = cx + _ddx[dir];
-        uint32_t nny = cy + _ddy[dir];
+        uint32_t nnx = x + _ddx[dir];
+        uint32_t nny = y + _ddy[dir];
 
         if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
 
             _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
 
-            carve_passage(nx, ny);
+            recursive_backtracking_algorithm(nx, ny);
         }
     }
 }

@@ -17,7 +17,7 @@ TEST(maze_generator_tests, print_maze){
     // N and M have to be odd
     maze my_maze(N, M);
 
-    my_maze.random_maze();
+    my_maze.random_maze(maze::dig_maze_algorithm::RBA);
     // Print with ascii characters
     my_maze.print_maze();
     std::cout << "\n";
@@ -34,14 +34,14 @@ TEST(maze_generator_tests, repeat_generator){
     for (int i = 0; i < NB_PASS; ++i) {
 
         // N and M have to be odd
-        uint N = common::random_number(5, 100);
+        uint N = common::random_number(5, 50);
         if (N % 2 == 0)
             N--;
-        uint M = common::random_number(5, 100);
+        uint M = common::random_number(5, 50);
         if (M % 2 == 0)
             M--;
         maze my_maze(N, M);
-        my_maze.random_maze();
+        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
     }
 }
 
@@ -53,10 +53,10 @@ TEST(find_path_tests, repeat_find_path){
     for (int i = 0; i < NB_PASS; ++i) {
 
         // N and M have to be odd
-        uint N = common::random_number(5, 100);
+        uint N = common::random_number(5, 50);
         if (N % 2 == 0)
             N--;
-        uint M = common::random_number(5, 100);
+        uint M = common::random_number(5, 50);
         if (M % 2 == 0)
             M--;
         maze my_maze(N, M);

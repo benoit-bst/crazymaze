@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <queue>
 #include <list>
 #include <algorithm>
@@ -50,10 +51,16 @@ public:
         unicode
     };
 
+    // Dig maze algorithm
+    enum class dig_maze_algorithm {
+        RBA,        // Recursive Backtracking Algorithm
+        DFSA        // Dethp-First Search Algorithm
+    };
+
     explicit maze(const uint32_t width, const uint32_t height);
     ~maze();
 
-    void random_maze();
+    void random_maze(const dig_maze_algorithm = dig_maze_algorithm::DFSA);
 
     bool find_path();
     void clean_path();
@@ -76,11 +83,11 @@ public:
 
 private:
 
-    vector<uint32_t> _directions;
-    vector<int32_t> _dx;
-    vector<int32_t> _dy;
-    vector<int32_t> _ddx;
-    vector<int32_t> _ddy;
+    array<uint32_t, 4> _directions;
+    array<int32_t, 4> _dx;
+    array<int32_t, 4> _dy;
+    array<int32_t, 4> _ddx;
+    array<int32_t, 4> _ddy;
 
     vector<vector<char>> _matrix;
     vector<vector<bool>> _visited;
@@ -93,9 +100,11 @@ private:
     bool _is_path;
 
     void initialize_matrix();
+    void dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
+    void recursive_backtracking_algorithm(int x, int y);
+    void deep_first_search_algorithm(int x, int y);
     bool create_random_doors();
     bool is_valid(const uint32_t x, const uint32_t y);
-    void carve_passage(int cx = 0, int cy = 0);
 };
 
 } // namespace cm
