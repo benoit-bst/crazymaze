@@ -31,17 +31,40 @@ TEST(maze_generator_tests, print_maze){
 */
 TEST(maze_generator_tests, repeat_generator){
 
-    for (int i = 0; i < NB_PASS; ++i) {
+    // N and M have to be odd.
+    // warning, RBA is a recursive function,
+    // so be carefull with the stack...
 
-        // N and M have to be odd
-        uint N = common::random_number(5, 50);
-        if (N % 2 == 0)
-            N--;
-        uint M = common::random_number(5, 50);
-        if (M % 2 == 0)
-            M--;
-        maze my_maze(N, M);
-        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
+    // RBA
+    {
+        for (int i = 0; i < NB_PASS; ++i) {
+
+            // N and M have to be odd
+            uint N = common::random_number(5, 50);
+            if (N % 2 == 0)
+                N--;
+            uint M = common::random_number(5, 50);
+            if (M % 2 == 0)
+                M--;
+            maze my_maze(N, M);
+            my_maze.random_maze(maze::dig_maze_algorithm::RBA);
+        }
+    }
+
+    // DFSA
+    {
+        for (int i = 0; i < NB_PASS; ++i) {
+
+            // N and M have to be odd
+            uint N = common::random_number(5, 50);
+            if (N % 2 == 0)
+                N--;
+            uint M = common::random_number(5, 50);
+            if (M % 2 == 0)
+                M--;
+            maze my_maze(N, M);
+            my_maze.random_maze(maze::dig_maze_algorithm::DFSA);
+        }
     }
 }
 
@@ -50,24 +73,58 @@ TEST(maze_generator_tests, repeat_generator){
 */
 TEST(find_path_tests, repeat_find_path){
 
-    for (int i = 0; i < NB_PASS; ++i) {
+    // N and M have to be odd.
+    // warning, RBA is a recursive function,
+    // so be carefull with the stack...
 
-        // N and M have to be odd
-        uint N = common::random_number(5, 50);
-        if (N % 2 == 0)
-            N--;
-        uint M = common::random_number(5, 50);
-        if (M % 2 == 0)
-            M--;
-        maze my_maze(N, M);
-        my_maze.random_maze();
-        ASSERT_EQ(my_maze.is_path(), false);
-        bool is_path = my_maze.find_path();
-        ASSERT_EQ(is_path, true);
-        if (is_path == false) {
-            my_maze.print_maze();
+    // RBA
+    {
+        for (int i = 0; i < NB_PASS; ++i) {
+
+            // N and M have to be odd.
+            // warning, RBA is a recursive function,
+            // so be carefull with the stack...
+            uint N = common::random_number(5, 50);
+            if (N % 2 == 0)
+                N--;
+            uint M = common::random_number(5, 50);
+            if (M % 2 == 0)
+                M--;
+            maze my_maze(N, M);
+            my_maze.random_maze(maze::dig_maze_algorithm::RBA);
+            ASSERT_EQ(my_maze.is_path(), false);
+            bool is_path = my_maze.find_path();
+            ASSERT_EQ(is_path, true);
+            if (is_path == false) {
+                my_maze.print_maze();
+            }
+            my_maze.clean_path();
         }
-        my_maze.clean_path();
+    }
+
+    // DFSA
+    {
+        for (int i = 0; i < NB_PASS; ++i) {
+
+            // N and M have to be odd.
+            // warning, RBA is a recursive function,
+            // so be carefull with the stack...
+            uint N = common::random_number(5, 50);
+            if (N % 2 == 0)
+                N--;
+            uint M = common::random_number(5, 50);
+            if (M % 2 == 0)
+                M--;
+            maze my_maze(N, M);
+            my_maze.random_maze(maze::dig_maze_algorithm::DFSA);
+            ASSERT_EQ(my_maze.is_path(), false);
+            bool is_path = my_maze.find_path();
+            ASSERT_EQ(is_path, true);
+            if (is_path == false) {
+                my_maze.print_maze();
+            }
+            my_maze.clean_path();
+        }
     }
 }
 
@@ -79,7 +136,7 @@ TEST(find_path_tests, find_path){
     {
         // N and M have to be odd
         maze my_maze(N, M);
-        my_maze.random_maze();
+        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
         ASSERT_EQ(my_maze.is_path(), false);
         bool is_path = my_maze.find_path();
         ASSERT_EQ(is_path, true);
@@ -90,11 +147,10 @@ TEST(find_path_tests, find_path){
     {
         // N and M have to be odd
         maze my_maze(N, M);
-        my_maze.random_maze();
+        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
         ASSERT_EQ(my_maze.is_path(), false);
         my_maze.clean_path();
         ASSERT_EQ(my_maze.is_path(), false);
-
     }
 }
 
