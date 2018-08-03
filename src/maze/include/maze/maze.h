@@ -64,13 +64,13 @@ public:
 
     bool find_path();
     void clean_path();
-    bool is_path();
+    bool is_path() const;
 
-    Coord entrance();
-    Coord exit();
+    Coord entrance() const;
+    Coord exit() const;
 
-    uint32_t maze_width();
-    uint32_t maze_height();
+    uint32_t maze_width() const;
+    uint32_t maze_height() const;
 
     void print_maze(const printing_type type = printing_type::ascii);
     vector<vector<char>>& matrix();

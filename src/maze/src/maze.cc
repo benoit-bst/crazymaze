@@ -95,7 +95,6 @@ bool maze::find_path()
         list<Coord> path;
         uint32_t length;
     };
-
     queue<node> q;
 
     // Add first cell
@@ -109,7 +108,7 @@ bool maze::find_path()
     {
         // Current element
         curr = q.front();
-        Coord pt = curr.path.back();
+        const Coord pt = curr.path.back();
 
         // If we have reached the destination cell,
         if (pt.first == _exit.first && pt.second == _exit.second - 1) {
@@ -123,8 +122,8 @@ bool maze::find_path()
 
         for (const auto & dir: _directions) {
 
-            uint32_t x = pt.first  + _ddx[dir];
-            uint32_t y = pt.second + _ddy[dir];
+            const int32_t x = pt.first  + _ddx[dir];
+            const int32_t y = pt.second + _ddy[dir];
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
@@ -166,7 +165,7 @@ void maze::clean_path()
 /**
  * @brief If path is finded
  */
-bool maze::is_path()
+bool maze::is_path() const
 {
    return _is_path;
 }
@@ -174,7 +173,7 @@ bool maze::is_path()
 /**
  * @brief Return entrance coords
  */
-Coord maze::entrance()
+Coord maze::entrance() const
 {
     return _entrance;
 }
@@ -182,7 +181,7 @@ Coord maze::entrance()
 /**
  * @brief Return exit coords
  */
-Coord maze::exit()
+Coord maze::exit() const
 {
     return _exit;
 }
@@ -190,7 +189,7 @@ Coord maze::exit()
 /**
  * @brief Return entrance coords
  */
-uint32_t maze::maze_width()
+uint32_t maze::maze_width() const
 {
     return _width;
 }
@@ -198,7 +197,7 @@ uint32_t maze::maze_width()
 /**
  * @brief Return exit coords
  */
-uint32_t maze::maze_height()
+uint32_t maze::maze_height() const
 {
     return _height;
 }
@@ -231,13 +230,14 @@ void maze::print_maze(const printing_type type)
           else {
               cout << termcolor::cyan;
           }
+
+          // Print character
           if (type == printing_type::unicode) {
               cout << common::unicode_characters(_matrix[i][j]);
           }
           else {
               cout << _matrix[i][j];
           }
-
       }
       cout << "\n";
     }
@@ -284,7 +284,6 @@ void maze::initialize_matrix()
                     _matrix[i][j] = vertical;
                 }
             }
-
             _visited[i][j] = false;
         }
     }
@@ -375,12 +374,12 @@ void maze::recursive_backtracking_algorithm(const int x, const int y)
     for (const auto & dir: _directions) {
 
         // new cell
-        const uint32_t nx = x + _dx[dir];
-        const uint32_t ny = y + _dy[dir];
+        const int32_t nx = x + _dx[dir];
+        const int32_t ny = y + _dy[dir];
 
         // border
-        const uint32_t nnx = x + _ddx[dir];
-        const uint32_t nny = y + _ddy[dir];
+        const int32_t nnx = x + _ddx[dir];
+        const int32_t nny = y + _ddy[dir];
 
         if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
 
