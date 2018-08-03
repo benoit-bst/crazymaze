@@ -337,19 +337,18 @@ void maze::dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_ma
             recursive_backtracking_algorithm(start_x, start_y);
             break;
         case dig_maze_algorithm::DFSA:
-            recursive_backtracking_algorithm(start_x, start_y);
+            deep_first_search_algorithm(start_x, start_y);
             break;
         default:
-            recursive_backtracking_algorithm(start_x, start_y);
-
+            deep_first_search_algorithm(start_x, start_y);
     }
 }
 
 /**
- *
+ * @brief Deep-first search algorithm to dig path within the maze
  *
  */
-void maze::deep_first_search_algorithm(int x, int y)
+void maze::deep_first_search_algorithm(const int x, const int y)
 {
 
 }
@@ -362,8 +361,10 @@ void maze::deep_first_search_algorithm(int x, int y)
  *     but only if the adjacent cell has not been visited yet. This becomes the new current cell.
  * 3. If all adjacent cells have been visited, back up to the last cell that has uncarved walls and repeat.
  * 4. The algorithm ends when the process has backed all the way up to the starting point.
+ *
+ * @warning This is a recursive function, so be carefull with the stack...
  */
-void maze::recursive_backtracking_algorithm(int x, int y)
+void maze::recursive_backtracking_algorithm(const int x, const int y)
 {
     // Shuffle direction
     std::mt19937 rng;
@@ -374,12 +375,12 @@ void maze::recursive_backtracking_algorithm(int x, int y)
     for (const auto & dir: _directions) {
 
         // new cell
-        uint32_t nx = x + _dx[dir];
-        uint32_t ny = y + _dy[dir];
+        const uint32_t nx = x + _dx[dir];
+        const uint32_t ny = y + _dy[dir];
 
         // border
-        uint32_t nnx = x + _ddx[dir];
-        uint32_t nny = y + _ddy[dir];
+        const uint32_t nnx = x + _ddx[dir];
+        const uint32_t nny = y + _ddy[dir];
 
         if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
 
@@ -391,3 +392,4 @@ void maze::recursive_backtracking_algorithm(int x, int y)
 }
 
 } // namespace cm
+

@@ -15,12 +15,12 @@ namespace cm {
 /**
  * @brief maze class provide methods to play with maze's algorithm
  *
- * Methods :
- * - Backtring algorithm to create maze
- * - Printing Maze in Raw mode or Unicode mode
- * - Finding the shortest path with BFS algorithm
+ * Generral Methods :
+ * - random_maze : create random maze with different algorithm
+ * - print_maze : Printing Maze in Raw mode or Unicode mode
+ * - finding_path : Finding the shortest path with BFS algorithm
  *
- *  @example Raw maze (10x10)
+ * @example Raw maze (10x10)
  *
  * I : Input
  * O : Output
@@ -83,14 +83,16 @@ public:
 
 private:
 
+    // Playing with directions
+    // to visit neighbours
     array<uint32_t, 4> _directions;
-    array<int32_t, 4> _dx;
-    array<int32_t, 4> _dy;
-    array<int32_t, 4> _ddx;
-    array<int32_t, 4> _ddy;
+    const array<int32_t, 4> _dx;
+    const array<int32_t, 4> _dy;
+    const array<int32_t, 4> _ddx;
+    const array<int32_t, 4> _ddy;
 
-    vector<vector<char>> _matrix;
-    vector<vector<bool>> _visited;
+    vector<vector<char>> _matrix;  // main matrix
+    vector<vector<bool>> _visited; // used to find path
 
     uint32_t _width;
     uint32_t _height;
@@ -100,9 +102,10 @@ private:
     bool _is_path;
 
     void initialize_matrix();
-    void dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
-    void recursive_backtracking_algorithm(int x, int y);
-    void deep_first_search_algorithm(int x, int y);
+    void dig_maze(const uint32_t start_x, const uint32_t start_y,
+                  const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
+    void recursive_backtracking_algorithm(const int x, const int y);
+    void deep_first_search_algorithm(const int x, const int y);
     bool create_random_doors();
     bool is_valid(const uint32_t x, const uint32_t y);
 };
