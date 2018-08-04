@@ -17,7 +17,7 @@ TEST(maze_generator_tests, print_maze){
     // N and M have to be odd
     maze my_maze(N, M);
 
-    my_maze.random_maze(maze::dig_maze_algorithm::DFSA);
+    my_maze.random_maze(maze::dig_maze_algorithm::DFS);
     // Print with ascii characters
     my_maze.print_maze();
     std::cout << "\n";
@@ -35,7 +35,7 @@ TEST(maze_generator_tests, repeat_generator){
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFSA, maze::dig_maze_algorithm::DFSA};
+    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
 
     for (const auto & a: dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {
@@ -62,7 +62,7 @@ TEST(find_path_tests, repeat_find_path){
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFSA, maze::dig_maze_algorithm::DFSA};
+    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
 
     for (const auto & a: dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {

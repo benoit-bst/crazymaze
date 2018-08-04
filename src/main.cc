@@ -46,7 +46,7 @@ int main(void)
     //my_maze.random_maze();
     // Print with ascii characters
 
-    my_maze.random_maze(maze::dig_maze_algorithm::DFSA);
+    my_maze.random_maze(maze::dig_maze_algorithm::DFS);
     my_maze.find_path();
     auto mat = my_maze.matrix();
     for (uint i = 0; i < mat.size();  ++i) {

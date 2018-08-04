@@ -72,78 +72,18 @@ void maze::random_maze(const dig_maze_algorithm dma)
 }
 
 /**
- * @brief Find shortest path with depth-first search algorithm
+ * @brief Find shortest path in the mazeœ
  */
-bool maze::find_path()
+bool maze::find_path(const shortest_path_algorithm spa)
 {
-    if (_is_path)
-        return true;
-
-    // Init visited
-    for (unsigned int i = 0; i < _height; ++i) {
-        for (unsigned int  j = 0; j < _width; ++j) {
-            if (_matrix[i][j] != empty_value)
-                _visited[i][j] = true;
-        }
+    switch (spa) {
+        case shortest_path_algorithm::BFS:
+            return breadth_first_search_algorithm();
+        case shortest_path_algorithm::AS:
+            return a_start_algorithm();
+        default:
+            return breadth_first_search_algorithm();
     }
-
-    // Mark the source cell as visited
-    _visited[_entrance.first][_entrance.second+1] = true;
-
-    // Create queue
-    struct node {
-        list<Coord> path;
-        uint length;
-    };
-    queue<node> q;
-
-    // Add first cell
-    node s;
-    s.path.push_front({_entrance.first, _entrance.second+1});
-    s.length = 0;
-    q.push(s);
-
-    node curr;
-    while (!q.empty())
-    {
-        // Current element
-        curr = q.front();
-        const Coord pt = curr.path.back();
-
-        // If we have reached the destination cell,
-        if (pt.first == _exit.first && pt.second == _exit.second - 1) {
-            _is_path = true;
-            break;
-        }
-
-        // Otherwise dequeue the front cell in the queue
-        // and enqueue its adjacent cells
-        q.pop();
-
-        for (const auto & dir: _directions) {
-
-            const int x = pt.first  + _ddx[dir];
-            const int y = pt.second + _ddy[dir];
-
-            // if adjacent cell is valid, has path and
-            // not visited yet, enqueue it.
-            if (is_valid(x, y) && (!_visited[x][y]))
-            {
-                // mark cell as visited and enqueue it
-                _visited[x][y] = true;
-                node adj_cell = {curr.path, curr.length + 1};
-                adj_cell.path.push_back({x, y});
-                q.push(adj_cell);
-            }
-        }
-    }
-
-    // Draw shortest path_height
-    for (const auto& cell: curr.path) {
-        _matrix[cell.first][cell.second] = visited_value;
-    }
-
-    return _is_path;
 }
 
 /**
@@ -335,10 +275,10 @@ void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algor
     _matrix[start_x][start_y] = empty_value;
 
     switch (dma) {
-        case dig_maze_algorithm::RDFSA:
+        case dig_maze_algorithm::RDFS:
             recursive_deep_first_search_algorithm(start_x, start_y);
             break;
-        case dig_maze_algorithm::DFSA:
+        case dig_maze_algorithm::DFS:
             deep_first_search_algorithm(start_x, start_y);
             break;
         default:
@@ -454,6 +394,89 @@ void maze::recursive_deep_first_search_algorithm(const int x, const int y)
             recursive_deep_first_search_algorithm(nx, ny);
         }
     }
+}
+
+/**
+ * @brief Find shortest path with depth-first search algorithm
+ */
+bool maze::breadth_first_search_algorithm()
+{
+    if (_is_path)
+        return true;
+
+    // Init visited
+    for (unsigned int i = 0; i < _height; ++i) {
+        for (unsigned int  j = 0; j < _width; ++j) {
+            if (_matrix[i][j] != empty_value)
+                _visited[i][j] = true;
+        }
+    }
+
+    // Mark the source cell as visited
+    _visited[_entrance.first][_entrance.second+1] = true;
+
+    // Create queue
+    struct node {
+        list<Coord> path;
+        uint length;
+    };
+    queue<node> q;
+
+    // Add first cell
+    node s;
+    s.path.push_front({_entrance.first, _entrance.second+1});
+    s.length = 0;
+    q.push(s);
+
+    node curr;
+    while (!q.empty())
+    {
+        // Current element
+        curr = q.front();
+        const Coord pt = curr.path.back();
+
+        // If we have reached the destination cell,
+        if (pt.first == _exit.first && pt.second == _exit.second - 1) {
+            _is_path = true;
+            break;
+        }
+
+        // Otherwise dequeue the front cell in the queue
+        // and enqueue its adjacent cells
+        q.pop();
+
+        for (const auto & dir: _directions) {
+
+            const int x = pt.first  + _ddx[dir];
+            const int y = pt.second + _ddy[dir];
+
+            // if adjacent cell is valid, has path and
+            // not visited yet, enqueue it.
+            if (is_valid(x, y) && (!_visited[x][y]))
+            {
+                // mark cell as visited and enqueue it
+                _visited[x][y] = true;
+                node adj_cell = {curr.path, curr.length + 1};
+                adj_cell.path.push_back({x, y});
+                q.push(adj_cell);
+            }
+        }
+    }
+
+    // Draw shortest path_height
+    for (const auto& cell: curr.path) {
+        _matrix[cell.first][cell.second] = visited_value;
+    }
+
+    return _is_path;
+}
+
+/**
+ * @brief Find shortest path with depth-first search algorithm
+ */
+bool maze::a_start_algorithm()
+{
+  // TODO A*
 }
 
 } // namespace cm

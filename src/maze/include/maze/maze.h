@@ -53,16 +53,22 @@ public:
 
     // Dig maze algorithm
     enum class dig_maze_algorithm {
-        RDFSA,      // Recursive Dethp-First Search Algorithm Algorithm
-        DFSA        // Dethp-First Search Algorithm
+        RDFS,      // Recursive Dethp-First Search Algorithm Algorithm
+        DFS        // Dethp-First Search Algorithm
+    };
+
+    // Shortest path algorithm
+    enum class shortest_path_algorithm {
+        BFS,        // Breadth_Fisrt search Algorithm
+        AS          // A* algorithm
     };
 
     explicit maze(const uint width, const uint height);
     ~maze();
 
-    void random_maze(const dig_maze_algorithm = dig_maze_algorithm::DFSA);
+    void random_maze(const dig_maze_algorithm = dig_maze_algorithm::DFS);
 
-    bool find_path();
+    bool find_path(const shortest_path_algorithm = shortest_path_algorithm::BFS);
     void clean_path();
     bool is_path() const;
 
@@ -102,13 +108,17 @@ private:
     bool _is_path;
 
     void initialize_matrix();
+    bool create_random_doors();
+    bool is_valid(const uint x, const uint y);
+
     void dig_maze(const uint start_x, const uint start_y,
-                  const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
+                  const dig_maze_algorithm dma = dig_maze_algorithm::DFS);
     void shuffle_directions();
     void recursive_deep_first_search_algorithm(const int x, const int y);
     void deep_first_search_algorithm(const int x, const int y);
-    bool create_random_doors();
-    bool is_valid(const uint x, const uint y);
+
+    bool breadth_first_search_algorithm();
+    bool a_start_algorithm();
 };
 
 } // namespace cm
