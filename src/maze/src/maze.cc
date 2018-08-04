@@ -1,13 +1,14 @@
 #include <maze/maze.h>
 
 #include <cassert>
+#include <stack>
 
 namespace cm {
 
 /**
  * @brief Constructor
  */
-maze::maze(const uint32_t width, const uint32_t height)
+maze::maze(const uint width, const uint height)
 : _directions({0,1,2,3}), // N,E,S,W
   _dx({-2, 0, 2, 0}),
   _dy({0, 2, 0, -2}),
@@ -55,15 +56,14 @@ void maze::random_maze(const dig_maze_algorithm dma)
         initialize_matrix();
 
         // We start to dig at random (x,y) position
-        uint32_t start_x = common::random_number(2, _height-1);
+        uint start_x = common::random_number(2, _height-1);
         if (start_x % 2 == 0)
             start_x--;
-        uint32_t start_y = common::random_number(2, _width-1);
+        uint start_y = common::random_number(2, _width-1);
         if (start_y % 2 == 0)
             start_y--;
 
         // Dig maze wih selected algorithm
-        _matrix[start_x][start_y] = empty_value;
         dig_maze(start_x, start_y, dma);
 
         is_created = create_random_doors();
@@ -93,7 +93,7 @@ bool maze::find_path()
     // Create queue
     struct node {
         list<Coord> path;
-        uint32_t length;
+        uint length;
     };
     queue<node> q;
 
@@ -122,8 +122,8 @@ bool maze::find_path()
 
         for (const auto & dir: _directions) {
 
-            const int32_t x = pt.first  + _ddx[dir];
-            const int32_t y = pt.second + _ddy[dir];
+            const int x = pt.first  + _ddx[dir];
+            const int y = pt.second + _ddy[dir];
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
@@ -189,7 +189,7 @@ Coord maze::exit() const
 /**
  * @brief Return entrance coords
  */
-uint32_t maze::maze_width() const
+uint maze::maze_width() const
 {
     return _width;
 }
@@ -197,7 +197,7 @@ uint32_t maze::maze_width() const
 /**
  * @brief Return exit coords
  */
-uint32_t maze::maze_height() const
+uint maze::maze_height() const
 {
     return _height;
 }
@@ -321,7 +321,7 @@ bool maze::create_random_doors()
 /**
  * @brief Is a valid cell
  */
-bool maze::is_valid(const uint32_t x, const uint32_t y)
+bool maze::is_valid(const uint x, const uint y)
 {
    return (x > 0) && (x < _height) && (y > 0) && (y < _width);
 }
@@ -329,8 +329,11 @@ bool maze::is_valid(const uint32_t x, const uint32_t y)
 /**
  * @brief Dig maze algorithm
  */
-void maze::dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_maze_algorithm dma)
+void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algorithm dma)
 {
+    // Mark the first cell as visited
+    _matrix[start_x][start_y] = empty_value;
+
     switch (dma) {
         case dig_maze_algorithm::RBA:
             recursive_backtracking_algorithm(start_x, start_y);
@@ -344,12 +347,76 @@ void maze::dig_maze(const uint32_t start_x, const uint32_t start_y, const dig_ma
 }
 
 /**
+ * @brief Shuffle directions to random visit cell
+ */
+void maze::shuffle_directions()
+{
+    std::mt19937 rng;
+    rng.seed(std::random_device()());
+    std::shuffle(_directions.begin(), _directions.end(), rng);
+}
+/**
  * @brief Deep-first search algorithm to dig path within the maze
  *
+ * 1. Randomly select a node (or cell) N.
+ * 2. Push the node N onto a queue Q.
+ * 3. Mark the cell N as visited.
+ * 4. Randomly select an adjacent cell A of node N that has not been visited.
+ *    If all the neighbors of N have been visited:
+ *    - Continue to pop items off the queue Q until a node is encountered
+ *      with at least one non-visited neighbor - assign this node to N and go to step 4.
+ *    - If no nodes exist: stop.
+ * 5. Break the wall between N and A.
+ * 6. Assign the value A to N.
+ * 7. Go to step 2.
  */
 void maze::deep_first_search_algorithm(const int x, const int y)
 {
+    // Create queue
+    stack<Coord> q;
 
+    // Add first cell
+    q.push(make_pair(x, y));
+
+    while (!q.empty())
+    {
+        // Current element
+        Coord current_cell = q.top();
+
+        shuffle_directions();
+
+        bool has_neighbour = false;
+
+        // For each direction
+        for (const auto & dir: _directions) {
+
+            // New cell
+            const int nx = current_cell.first  + _dx[dir];
+            const int ny = current_cell.second + _dy[dir];
+
+            // Border
+            const int nnx = current_cell.first + _ddx[dir];
+            const int nny = current_cell.second + _ddy[dir];
+
+            if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
+
+                _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
+
+                // Save cell
+                q.push(make_pair(nx ,ny));
+
+                has_neighbour = true;
+                break;
+            }
+        }
+
+        // We didn't find free cell,
+        // we backtrack.
+        if (has_neighbour == false) {
+            q.pop();
+        }
+
+    }
 }
 
 /**
@@ -365,21 +432,18 @@ void maze::deep_first_search_algorithm(const int x, const int y)
  */
 void maze::recursive_backtracking_algorithm(const int x, const int y)
 {
-    // Shuffle direction
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::shuffle(_directions.begin(), _directions.end(), rng);
+    shuffle_directions();
 
     // For each direction
     for (const auto & dir: _directions) {
 
         // new cell
-        const int32_t nx = x + _dx[dir];
-        const int32_t ny = y + _dy[dir];
+        const int nx = x + _dx[dir];
+        const int ny = y + _dy[dir];
 
         // border
-        const int32_t nnx = x + _ddx[dir];
-        const int32_t nny = y + _ddy[dir];
+        const int nnx = x + _ddx[dir];
+        const int nny = y + _ddy[dir];
 
         if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
 

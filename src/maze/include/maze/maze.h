@@ -57,7 +57,7 @@ public:
         DFSA        // Dethp-First Search Algorithm
     };
 
-    explicit maze(const uint32_t width, const uint32_t height);
+    explicit maze(const uint width, const uint height);
     ~maze();
 
     void random_maze(const dig_maze_algorithm = dig_maze_algorithm::DFSA);
@@ -69,8 +69,8 @@ public:
     Coord entrance() const;
     Coord exit() const;
 
-    uint32_t maze_width() const;
-    uint32_t maze_height() const;
+    uint maze_width() const;
+    uint maze_height() const;
 
     void print_maze(const printing_type type = printing_type::ascii);
     vector<vector<char>>& matrix();
@@ -85,29 +85,30 @@ private:
 
     // Playing with directions
     // to visit neighbours
-    array<uint32_t, 4> _directions;
-    const array<int32_t, 4> _dx;
-    const array<int32_t, 4> _dy;
-    const array<int32_t, 4> _ddx;
-    const array<int32_t, 4> _ddy;
+    array<uint, 4> _directions;
+    const array<int, 4> _dx;
+    const array<int, 4> _dy;
+    const array<int, 4> _ddx;
+    const array<int, 4> _ddy;
 
     vector<vector<char>> _matrix;  // main matrix
     vector<vector<bool>> _visited; // used to find path
 
-    uint32_t _width;
-    uint32_t _height;
+    uint _width;
+    uint _height;
 
     Coord _entrance;
     Coord _exit;
     bool _is_path;
 
     void initialize_matrix();
-    void dig_maze(const uint32_t start_x, const uint32_t start_y,
+    void dig_maze(const uint start_x, const uint start_y,
                   const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
+    void shuffle_directions();
     void recursive_backtracking_algorithm(const int x, const int y);
     void deep_first_search_algorithm(const int x, const int y);
     bool create_random_doors();
-    bool is_valid(const uint32_t x, const uint32_t y);
+    bool is_valid(const uint x, const uint y);
 };
 
 } // namespace cm
