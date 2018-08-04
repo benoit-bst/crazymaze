@@ -45,7 +45,7 @@ maze::~maze()
  * 1. Default maze creation
  * 2. Add random doors
  * 3. Backtracking algorithm to create path
- *    - Recursive Backtracking Algorithm
+ *    - Recursive Deep-First Search Algorithm
  *    - Dethp-First Search Algorithm
  */
 void maze::random_maze(const dig_maze_algorithm dma)
@@ -335,8 +335,8 @@ void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algor
     _matrix[start_x][start_y] = empty_value;
 
     switch (dma) {
-        case dig_maze_algorithm::RBA:
-            recursive_backtracking_algorithm(start_x, start_y);
+        case dig_maze_algorithm::RDFSA:
+            recursive_deep_first_search_algorithm(start_x, start_y);
             break;
         case dig_maze_algorithm::DFSA:
             deep_first_search_algorithm(start_x, start_y);
@@ -357,6 +357,8 @@ void maze::shuffle_directions()
 }
 /**
  * @brief Deep-first search algorithm to dig path within the maze
+ *
+ * @note We use stack for backtracking
  *
  * 1. Randomly select a node (or cell) N.
  * 2. Push the node N onto a queue Q.
@@ -420,7 +422,7 @@ void maze::deep_first_search_algorithm(const int x, const int y)
 }
 
 /**
- * @brief Recursive backtracking algorithm to dig path within the maze
+ * @brief Recursive Deep-First Search algorithm to dig path within the maze
  *
  * 1. Choose a starting point in the field.
  * 2. Randomly choose a wall at that point and carve a passage through to the adjacent cell,
@@ -430,7 +432,7 @@ void maze::deep_first_search_algorithm(const int x, const int y)
  *
  * @warning This is a recursive function, so be carefull with the stack...
  */
-void maze::recursive_backtracking_algorithm(const int x, const int y)
+void maze::recursive_deep_first_search_algorithm(const int x, const int y)
 {
     shuffle_directions();
 
@@ -449,7 +451,7 @@ void maze::recursive_backtracking_algorithm(const int x, const int y)
 
             _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
 
-            recursive_backtracking_algorithm(nx, ny);
+            recursive_deep_first_search_algorithm(nx, ny);
         }
     }
 }

@@ -53,7 +53,7 @@ public:
 
     // Dig maze algorithm
     enum class dig_maze_algorithm {
-        RBA,        // Recursive Backtracking Algorithm
+        RDFSA,      // Recursive Dethp-First Search Algorithm Algorithm
         DFSA        // Dethp-First Search Algorithm
     };
 
@@ -105,7 +105,7 @@ private:
     void dig_maze(const uint start_x, const uint start_y,
                   const dig_maze_algorithm dma = dig_maze_algorithm::DFSA);
     void shuffle_directions();
-    void recursive_backtracking_algorithm(const int x, const int y);
+    void recursive_deep_first_search_algorithm(const int x, const int y);
     void deep_first_search_algorithm(const int x, const int y);
     bool create_random_doors();
     bool is_valid(const uint x, const uint y);

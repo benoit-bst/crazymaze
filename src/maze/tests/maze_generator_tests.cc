@@ -35,7 +35,7 @@ TEST(maze_generator_tests, repeat_generator){
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RBA, maze::dig_maze_algorithm::DFSA};
+    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFSA, maze::dig_maze_algorithm::DFSA};
 
     for (const auto & a: dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {
@@ -62,7 +62,7 @@ TEST(find_path_tests, repeat_find_path){
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RBA, maze::dig_maze_algorithm::DFSA};
+    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFSA, maze::dig_maze_algorithm::DFSA};
 
     for (const auto & a: dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {
@@ -97,7 +97,7 @@ TEST(find_path_tests, find_path){
     {
         // N and M have to be odd
         maze my_maze(N, M);
-        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
+        my_maze.random_maze();
         ASSERT_EQ(my_maze.is_path(), false);
         bool is_path = my_maze.find_path();
         ASSERT_EQ(is_path, true);
@@ -108,7 +108,7 @@ TEST(find_path_tests, find_path){
     {
         // N and M have to be odd
         maze my_maze(N, M);
-        my_maze.random_maze(maze::dig_maze_algorithm::RBA);
+        my_maze.random_maze();
         ASSERT_EQ(my_maze.is_path(), false);
         my_maze.clean_path();
         ASSERT_EQ(my_maze.is_path(), false);
