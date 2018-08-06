@@ -79,7 +79,7 @@ public:
     uint maze_height() const;
 
     void print_maze(const printing_type type = printing_type::ascii);
-    vector<vector<char>>& matrix();
+    vector<char>& matrix();
 
     maze(const maze &) = delete;
     maze& operator=(const maze &) = delete;
@@ -97,8 +97,8 @@ private:
     const array<int, 4> _ddx;
     const array<int, 4> _ddy;
 
-    vector<vector<char>> _matrix;  // main matrix
-    vector<vector<bool>> _visited; // used to find path
+    vector<char> _flat_matrix; // main matrix
+    vector<bool> _visited;     // used to find path
 
     uint _width;
     uint _height;
@@ -107,9 +107,10 @@ private:
     Coord _exit;
     bool _is_path;
 
-    void initialize_matrix();
+    void initialize_flat_matrix();
     bool create_random_doors();
     bool is_valid(const uint x, const uint y);
+    uint convert_coords(const uint x, const uint y);
 
     void dig_maze(const uint start_x, const uint start_y,
                   const dig_maze_algorithm dma = dig_maze_algorithm::DFS);
@@ -118,7 +119,7 @@ private:
     void deep_first_search_algorithm(const int x, const int y);
 
     bool breadth_first_search_algorithm();
-    bool a_start_algorithm();
+    bool a_star_algorithm();
 };
 
 } // namespace cm

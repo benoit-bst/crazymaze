@@ -49,11 +49,10 @@ int main(void)
     my_maze.random_maze(maze::dig_maze_algorithm::DFS);
     my_maze.find_path();
     auto mat = my_maze.matrix();
-    for (uint i = 0; i < mat.size();  ++i) {
-        for (uint j = 0; j < mat[i].size();  ++j) {
-            printw("%c", mat[i][j]);
-        }
-        printw("\n");
+    for (uint i = 0; i < mat.size(); ++i) {
+        if (i % N == 0)
+            printw("\n");
+        printw("%c", mat[i]);
     }
     refresh();
     getch();

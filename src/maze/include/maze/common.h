@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <utility>
 #include <random>
 #include <termcolor/termcolor.hpp>
@@ -29,6 +30,7 @@ static const std::string visited_value_unicode = "\u2588";
 class common {
 public:
     static std::string unicode_characters(const char characters);
+    static void term_color(const char characters);
     static uint32_t random_number(const uint32_t min, const uint32_t max);
 };
 

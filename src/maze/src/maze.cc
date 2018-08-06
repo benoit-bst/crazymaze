@@ -22,13 +22,8 @@ maze::maze(const uint width, const uint height)
     assert((height % 2) != 0 && "height need to be odd");
 
     // matrix alloc
-    _matrix.resize(height);
-    _visited.resize(height);
-    for (uint i = 0; i < _matrix.size(); ++i)
-    {
-      _matrix[i].resize(width);
-      _visited[i].resize(width);
-    }
+    _flat_matrix.resize(height*width);
+    _visited.resize(height*width);
 }
 
 /**
@@ -53,7 +48,7 @@ void maze::random_maze(const dig_maze_algorithm dma)
     _is_path = false;
     bool is_created = false;
     do {
-        initialize_matrix();
+        initialize_flat_matrix();
 
         // We start to dig at random (x,y) position
         uint start_x = common::random_number(2, _height-1);
@@ -80,7 +75,7 @@ bool maze::find_path(const shortest_path_algorithm spa)
         case shortest_path_algorithm::BFS:
             return breadth_first_search_algorithm();
         case shortest_path_algorithm::AS:
-            return a_start_algorithm();
+            return a_star_algorithm();
         default:
             return breadth_first_search_algorithm();
     }
@@ -92,11 +87,9 @@ bool maze::find_path(const shortest_path_algorithm spa)
 void maze::clean_path()
 {
     if (_is_path) {
-        for (unsigned int i = 1; i < _height - 1; i++) {
-            for (unsigned int j = 1; j < _width - 1; j++) {
-                if (_matrix[i][j] == visited_value)
-                    _matrix[i][j] = empty_value;
-            }
+        for (auto & cell : _flat_matrix) {
+            if (cell == visited_value)
+                cell = empty_value;
         }
         _is_path = false;
     }
@@ -147,85 +140,65 @@ uint maze::maze_height() const
  */
 void maze::print_maze(const printing_type type)
 {
-    for(size_t i = 0; i < _height; ++i) {
-      for(size_t j = 0; j < _width; ++j) {
-          // input
-          if ((i == _entrance.first) && (j == _entrance.second)){
-              cout << termcolor::red;
-          }
-          // ouput
-          else if ((i == _exit.first) && (j == _exit.second)){
-              cout << termcolor::red;
-          }
-          // borders
-          else if ((i == 0) || (j == 0) || (i == _height-1) || (j == _width-1)) {
-              cout << termcolor::green;
-          }
-          // path
-          else if (_matrix[i][j] == visited_value){
-              cout << termcolor::yellow;
-
-          }
-          // within the maze
-          else {
-              cout << termcolor::cyan;
-          }
-
-          // Print character
-          if (type == printing_type::unicode) {
-              cout << common::unicode_characters(_matrix[i][j]);
-          }
-          else {
-              cout << _matrix[i][j];
-          }
-      }
-      cout << "\n";
+    for (uint i = 0; i < _width*_height; ++i) {
+        if (!(i % _width)) {
+            cout << "\n";
+        }
+        common::term_color(_flat_matrix[i]);
+        if (type == printing_type::unicode) {
+            cout << common::unicode_characters(_flat_matrix[i]);
+        }
+        else {
+            cout << _flat_matrix[i];
+        }
     }
+    cout << "\n";
 }
 
 /**
  * @brief return the maze char matrix
  */
-vector<vector<char>>& maze::matrix()
+vector<char>& maze::matrix()
 {
-    return _matrix;
+    return _flat_matrix;
 }
 
 /**
  * @brief Create full initial maze
  */
-void maze::initialize_matrix()
+void maze::initialize_flat_matrix()
 {
-    // Create border
-    for (size_t i = 0; i < _height; ++i) {
-        _matrix[i][0] = border;
-        _matrix[i][_width - 1] = border;
-    }
-    for (size_t i = 0; i < _width; ++i) {
-        _matrix[0][i] = border;
-        _matrix[_height - 1][i] = border;
-    }
+    for (uint i = 0; i < _height*_width; ++i) {
 
-    // Fill maze
-    for(size_t i = 1; i < _height - 1; ++i) {
-        for(size_t j = 1; j < _width - 1; ++j) {
-
-            // Plain line
-            if (!(i % 2)) {
-                if (!(j % 2)) {
-                    _matrix[i][j] = cross;
-                } else {
-                    _matrix[i][j] = horizontal;
-                }
-            } else {
-                if (j % 2) {
-                    _matrix[i][j] = default_value;
-                 } else {
-                    _matrix[i][j] = vertical;
-                }
-            }
-            _visited[i][j] = false;
+        // x border
+        if ( (i < _width) || (i > (_width*(_height - 1)))) {
+            _flat_matrix[i] = border;
         }
+        // y border
+        else if ( (i % (_width) == 0) ) {
+            _flat_matrix[i-1] = border;
+            _flat_matrix[i] = border;
+        }
+        // internal cell
+        else {
+
+            uint line_number = floor(i / _width);
+            // vertical
+            if (line_number % 2 != 0) {
+                if (i % 2 == 0)
+                    _flat_matrix[i] = default_value;
+                else
+                    _flat_matrix[i] = vertical;
+            }
+            // horizontal
+            else {
+                if (i % 2 == 0)
+                    _flat_matrix[i] = cross;
+                else
+                    _flat_matrix[i] = horizontal;
+            }
+        }
+        _visited[i] = false;
     }
 }
 
@@ -248,12 +221,12 @@ bool maze::create_random_doors()
     // It is a possible case. Backtring can create dead cell.
     // The dead cell can be the start or the end cell.
     // In this case you have to relaunch the carve passage
-    if ( (_matrix[_entrance.first][_entrance.second + 1] != empty_value) ||
-         (_matrix[_exit.first][_exit.second - 1] != empty_value) ) {
+    if ( (_flat_matrix[convert_coords(_entrance.first, _entrance.second + 1)] != empty_value) ||
+         (_flat_matrix[convert_coords(_exit.first, _exit.second - 1)] != empty_value) ) {
         return false;
     } else {
-        _matrix[_entrance.first][_entrance.second] = 73;
-        _matrix[_exit.first][_exit.second] = 79;
+        _flat_matrix[convert_coords(_entrance.first, _entrance.second)] = 73;
+        _flat_matrix[convert_coords(_exit.first, _exit.second)] = 79;
         return true;
     }
 }
@@ -267,12 +240,23 @@ bool maze::is_valid(const uint x, const uint y)
 }
 
 /**
+ * @brief Convert coords for flat matrix
+ *
+ * @param x For height
+ * @param y For width
+ */
+uint maze::convert_coords(const uint x, const uint y)
+{
+    return x*_width + y;
+}
+
+/**
  * @brief Dig maze algorithm
  */
 void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algorithm dma)
 {
     // Mark the first cell as visited
-    _matrix[start_x][start_y] = empty_value;
+    _flat_matrix[convert_coords(start_x, start_y)] = empty_value;
 
     switch (dma) {
         case dig_maze_algorithm::RDFS:
@@ -287,7 +271,7 @@ void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algor
 }
 
 /**
- * @brief Shuffle directions to random visit cell
+ * @brief shuffle directions to random visit cell
  */
 void maze::shuffle_directions()
 {
@@ -295,6 +279,7 @@ void maze::shuffle_directions()
     rng.seed(std::random_device()());
     std::shuffle(_directions.begin(), _directions.end(), rng);
 }
+
 /**
  * @brief Deep-first search algorithm to dig path within the maze
  *
@@ -320,8 +305,7 @@ void maze::deep_first_search_algorithm(const int x, const int y)
     // Add first cell
     q.push(make_pair(x, y));
 
-    while (!q.empty())
-    {
+    while (!q.empty()) {
         // Current element
         Coord current_cell = q.top();
 
@@ -340,9 +324,9 @@ void maze::deep_first_search_algorithm(const int x, const int y)
             const int nnx = current_cell.first + _ddx[dir];
             const int nny = current_cell.second + _ddy[dir];
 
-            if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
+            if ( is_valid(nx,ny) && (_flat_matrix[convert_coords(nx, ny)] == default_value) ) {
 
-                _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
+                _flat_matrix[convert_coords(nx, ny)] = _flat_matrix[convert_coords(nnx, nny)] = empty_value;
 
                 // Save cell
                 q.push(make_pair(nx ,ny));
@@ -357,7 +341,6 @@ void maze::deep_first_search_algorithm(const int x, const int y)
         if (has_neighbour == false) {
             q.pop();
         }
-
     }
 }
 
@@ -387,9 +370,9 @@ void maze::recursive_deep_first_search_algorithm(const int x, const int y)
         const int nnx = x + _ddx[dir];
         const int nny = y + _ddy[dir];
 
-        if ( is_valid(nx,ny) && (_matrix[nx][ny] == default_value) ) {
+        if ( is_valid(nx,ny) && (_flat_matrix[convert_coords(nx, ny)] == default_value) ) {
 
-            _matrix[nx][ny] = _matrix[nnx][nny] = empty_value;
+            _flat_matrix[convert_coords(nx, ny)] = _flat_matrix[convert_coords(nnx, nny)] = empty_value;
 
             recursive_deep_first_search_algorithm(nx, ny);
         }
@@ -405,15 +388,13 @@ bool maze::breadth_first_search_algorithm()
         return true;
 
     // Init visited
-    for (unsigned int i = 0; i < _height; ++i) {
-        for (unsigned int  j = 0; j < _width; ++j) {
-            if (_matrix[i][j] != empty_value)
-                _visited[i][j] = true;
-        }
+    for (uint i = 0; i < _height*_width; ++i) {
+        if (_flat_matrix[i] != empty_value)
+            _visited[i] = true;
     }
 
     // Mark the source cell as visited
-    _visited[_entrance.first][_entrance.second+1] = true;
+    _visited[convert_coords(_entrance.first, _entrance.second + 1)] = true;
 
     // Create queue
     struct node {
@@ -429,8 +410,8 @@ bool maze::breadth_first_search_algorithm()
     q.push(s);
 
     node curr;
-    while (!q.empty())
-    {
+    while (!q.empty()) {
+
         // Current element
         curr = q.front();
         const Coord pt = curr.path.back();
@@ -452,10 +433,9 @@ bool maze::breadth_first_search_algorithm()
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
-            if (is_valid(x, y) && (!_visited[x][y]))
-            {
+            if (is_valid(x, y) && (!_visited[convert_coords(x, y)])) {
                 // mark cell as visited and enqueue it
-                _visited[x][y] = true;
+                _visited[convert_coords(x, y)] = true;
                 node adj_cell = {curr.path, curr.length + 1};
                 adj_cell.path.push_back({x, y});
                 q.push(adj_cell);
@@ -465,7 +445,7 @@ bool maze::breadth_first_search_algorithm()
 
     // Draw shortest path_height
     for (const auto& cell: curr.path) {
-        _matrix[cell.first][cell.second] = visited_value;
+        _flat_matrix[convert_coords(cell.first, cell.second)] = visited_value;
     }
 
     return _is_path;
@@ -474,9 +454,10 @@ bool maze::breadth_first_search_algorithm()
 /**
  * @brief Find shortest path with depth-first search algorithm
  */
-bool maze::a_start_algorithm()
+bool maze::a_star_algorithm()
 {
   // TODO A*
+  return false;
 }
 
 } // namespace cm
