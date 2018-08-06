@@ -23,7 +23,6 @@ maze::maze(const uint width, const uint height)
 
     // matrix alloc
     _flat_matrix.resize(height*width);
-    _visited.resize(height*width);
 }
 
 /**
@@ -198,7 +197,6 @@ void maze::initialize_flat_matrix()
                     _flat_matrix[i] = horizontal;
             }
         }
-        _visited[i] = false;
     }
 }
 
@@ -306,6 +304,7 @@ void maze::deep_first_search_algorithm(const int x, const int y)
     q.push(make_pair(x, y));
 
     while (!q.empty()) {
+
         // Current element
         Coord current_cell = q.top();
 
@@ -387,14 +386,8 @@ bool maze::breadth_first_search_algorithm()
     if (_is_path)
         return true;
 
-    // Init visited
-    for (uint i = 0; i < _height*_width; ++i) {
-        if (_flat_matrix[i] != empty_value)
-            _visited[i] = true;
-    }
-
     // Mark the source cell as visited
-    _visited[convert_coords(_entrance.first, _entrance.second + 1)] = true;
+    _flat_matrix[convert_coords(_entrance.first, _entrance.second + 1)] = visited_value;
 
     // Create queue
     struct node {
@@ -433,14 +426,21 @@ bool maze::breadth_first_search_algorithm()
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
-            if (is_valid(x, y) && (!_visited[convert_coords(x, y)])) {
+            if (is_valid(x, y) && (_flat_matrix[convert_coords(x, y)] == empty_value)) {
+
                 // mark cell as visited and enqueue it
-                _visited[convert_coords(x, y)] = true;
+                _flat_matrix[convert_coords(x, y)] = visited_value;
                 node adj_cell = {curr.path, curr.length + 1};
                 adj_cell.path.push_back({x, y});
                 q.push(adj_cell);
             }
         }
+    }
+
+    // Clean maze
+    for (auto & cell: _flat_matrix) {
+        if (cell == visited_value)
+            cell = empty_value;
     }
 
     // Draw shortest path_height

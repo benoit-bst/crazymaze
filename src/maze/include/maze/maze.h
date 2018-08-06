@@ -98,7 +98,6 @@ private:
     const array<int, 4> _ddy;
 
     vector<char> _flat_matrix; // main matrix
-    vector<bool> _visited;     // used to find path
 
     uint _width;
     uint _height;
