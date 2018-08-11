@@ -53,7 +53,7 @@ public:
 
     // Dig maze algorithm
     enum class dig_maze_algorithm {
-        RDFS,      // Recursive Dethp-First Search Algorithm Algorithm
+        RDFS,      // Recursive Dethp-First Search  Algorithm
         DFS        // Dethp-First Search Algorithm
     };
 
