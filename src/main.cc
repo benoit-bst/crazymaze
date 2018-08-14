@@ -11,7 +11,7 @@ Choice handle_menu()
     curs_set(0);
     clear();
     noecho();
-    cbreak();   /* Line buffering disabled. pass on everything */
+    cbreak(); // Line buffering disabled. pass on everything
 
     // color
     if (has_colors() == FALSE) {
@@ -29,13 +29,17 @@ Choice handle_menu()
     init_pair(6, COLOR_CYAN, COLOR_BLACK);
     init_pair(7, COLOR_BLUE, COLOR_BLACK);
     init_pair(8, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(9, COLOR_RED, COLOR_GREEN);
+    init_pair(10, COLOR_RED, COLOR_WHITE);
 
     // Title
+    attron(COLOR_PAIR(2));
     printw("%s\n", title.c_str());
 
     // How to
     printw("\n\n Use arrow keys to go up and down,\n");
     printw(" Press enter to select a choice\n");
+    attroff(COLOR_PAIR(2));
     refresh();
 
     // Menu
@@ -64,12 +68,14 @@ Choice handle_menu()
                 break;
             default:
                 mvprintw(24, 0, "Please select and press enter");
-                //mvprintw(24, 0, "Charcter pressed is = %3d Hopefully it can be printed as '%c'", c, c);
+                if (c == 27)
+                    endwin();
+                    exit(1);
                 refresh();
                 break;
         }
         print_menu(menu_win, highlight);
-        if(choice != 0) /* User did a choice come out of the infinite loop */
+        if(choice != 0) // User did a choice come out of the infinite loop
             break;
     }
     mvprintw(23, 0, "You chose choice %d with choice string %s\n", choice, menu[choice - 1]);
@@ -118,13 +124,14 @@ void demo()
     initscr();
     clear();
     noecho();
-    cbreak();   /* Line buffering disabled. pass on everything */
-
+    cbreak(); // Line buffering disabled. pass on everything
 
     // How to
+    attron(COLOR_PAIR(9));
     printw("\n Welcome to demo\n");
+    attroff(COLOR_PAIR(9));
     refresh();
-    usleep(500000);
+    usleep(400000);
     printw("\n Choose your maze size,\n");
     printw(" and find your path little rat...\n");
     printw(" Move:\n");
@@ -210,8 +217,9 @@ void bye()
     initscr();
     clear();
     noecho();
-    cbreak();   /* Line buffering disabled. pass on everything */
+    cbreak(); //  Line buffering disabled. pass on everything
 
+    attron(COLOR_PAIR(2));
     printw("%s ", bye_little_rat.c_str());
     refresh();
     for (uint i = 0; i < 20; ++i) {
@@ -219,6 +227,7 @@ void bye()
         refresh();
         usleep(50000);
     }
+    attroff(COLOR_PAIR(2));
     endwin();
 }
 
@@ -249,113 +258,4 @@ int main()
     }
     return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int kbhit(void)
-{
-    int ch = getch();
-
-    if (ch != ERR) {
-        ungetch(ch);
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-
-// main(void)
-// {
-//     //[> WINDOW* boite; <]
-//     initscr(); // Init WINDOW struct
-
-//     // title
-//     printw("%s\n", title.c_str());
-
-//     // menu
-//     printw("\n%s\n", menu.c_str());
-
-//     while(1) {
-
-//         getch();
-//         if ( (getch() == Q_value) || (getch() == q_value) )
-//             break;
-//     }
-
-
-//     int N = COLS - 1;
-//     int M = LINES - 1;
-//     if (N  % 2 == 0)
-//         N--;
-//     if (M % 2 == 0)
-//         M--;
-
-//     //cout << "COLS " << COLS << endl;
-//     //cout << "LINES " << LINES << endl;
-//     //cout << "N " << N << endl;
-//     //cout << "M " << M << endl;
-//     //printw("COLS %d\n", COLS);
-//     //printw("LINES %d\n", LINES);
-//     //printw("N %d\n", N);
-//     //printw("M %d\n", M);
-
-//     //maze my_maze(N,M);
-
-//     //my_maze.random_maze(maze::dig_maze_algorithm::DFS);
-//     //my_maze.find_path();
-//     //auto mat = my_maze.matrix();
-//     //for (uint i = 0; i < mat.size(); ++i) {
-//         //if (i % N == 0)
-//             //printw("\n");
-//         //printw("%c", mat[i]);
-//     //}
-//     refresh();
-//     getch();
-//     endwin();
-
-//     /* printw("Term size x %d - y %d\n", LINES, COLS); */
-
-//     /* while(1) { */
-//     /*     printw("Le terminal actuel comporte %d lignes et %d colonnes\n", LINES, COLS); */
-//     /*     refresh();  // Rafraîchit la fenêtre par défaut (stdscr) afin d'afficher le message */
-//     /*     if(getch() != 410)  // 410 est le code de la touche générée lorsqu'on redimensionne le terminal */
-//     /*         printw("Le  %c\n", ); */
-//     /*         /1* break; *1/ */
-//     /*     } */
-
-//     /*     endwin(); */
-
-//     /*     free(boite); */
-
-//     /* return 0; */
-
-//     //cbreak();
-//     //noecho();
-//     //nodelay(stdscr, TRUE);
-
-//     //scrollok(stdscr, TRUE);
-//     //while (1) {
-//         //if (kbhit()) {
-//             //printw("Key pressed! It was: %d\n", getch());
-//             //refresh();
-//         //} else {
-//              //printw("No key pressed yet...\n");
-//             //refresh();
-//             //usleep(100);
-//         //}
-//     //}
-//     return 0;
-// }
 
