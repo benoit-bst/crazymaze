@@ -1,7 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <unistd.h>  // only for sleep()
+#include <locale.h>  // only for sleep()
+#include <iostream>
 
 #include <ncurses.h> // graphic lib for term
 
@@ -16,6 +17,8 @@ static constexpr char N_value = 78;
 static constexpr char n_value = 110;
 static constexpr char Q_value = 81;
 static constexpr char q_value = 113;
+
+void convert_char(const char simple_char);
 
 //------------------------------
 // Main title

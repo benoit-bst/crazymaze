@@ -8,6 +8,7 @@ Choice handle_menu()
     int c;
 
     initscr();
+    curs_set(0);
     clear();
     noecho();
     cbreak();   /* Line buffering disabled. pass on everything */
@@ -95,7 +96,6 @@ void print_menu(WINDOW *menu_win, const uint highlight)
     wrefresh(menu_win);
 }
 
-
 void demo()
 {
     initscr();
@@ -106,6 +106,8 @@ void demo()
     // How to
     printw("\n Welcome to demo\n");
     refresh();
+    usleep(500000);
+    printw("\n Choose your maze size\n");
 
     const uint width = 51;
     const uint height = 21;
@@ -117,11 +119,46 @@ void demo()
     for (uint i = 0; i < mat.size(); ++i) {
         if (i % width == 0)
             printw("\n");
-        printw("%c", mat[i]);
+        convert_char(mat[i]);
     }
     refresh();
     getch();
     endwin();
+}
+
+void convert_char(const char simple_char)
+{
+    switch (simple_char) {
+        case default_value:
+            addch(ACS_BULLET);
+            break;
+        case empty_value:
+            addch(simple_char);
+            break;
+        case visited_value:
+            addch(ACS_DIAMOND);
+            break;
+        case cm::border:
+            addch(ACS_CKBOARD);
+            break;
+        case cross:
+            addch(ACS_PLUS);
+            break;
+        case vertical:
+            addch(ACS_VLINE);
+            break;
+        case horizontal:
+            addch(ACS_HLINE);
+            break;
+        case input:
+            addch(ACS_PLUS);
+            break;
+        case output:
+            addch(ACS_PLUS);
+            break;
+        default:
+            break;
+    }
 }
 
 void bye()
@@ -136,13 +173,15 @@ void bye()
     for (uint i = 0; i < 20; ++i) {
         printw(".");
         refresh();
-        usleep(79000);
+        usleep(50000);
     }
     endwin();
 }
 
 int main()
 {
+    setlocale(LC_ALL, "");
+
     while(1) {
 
         // Menu
@@ -157,14 +196,14 @@ int main()
                 break;
             case Choice::exit:
                 bye();
-                return 0;
+                return EXIT_SUCCESS;
                 break;
             default:
-                return 0;
+                return EXIT_SUCCESS;
 
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 
