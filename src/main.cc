@@ -21,16 +21,7 @@ Choice handle_menu()
     }
 
     start_color();
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_BLACK);
-    init_pair(4, COLOR_BLACK, COLOR_BLACK);
-    init_pair(5, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(6, COLOR_CYAN, COLOR_BLACK);
-    init_pair(7, COLOR_BLUE, COLOR_BLACK);
-    init_pair(8, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(9, COLOR_RED, COLOR_GREEN);
-    init_pair(10, COLOR_RED, COLOR_WHITE);
+    utils::init_color();
 
     // Title
     attron(COLOR_PAIR(2));
@@ -83,20 +74,7 @@ Choice handle_menu()
     refresh();
     endwin();
 
-    switch (choice) {
-        case 1:
-            return Choice::demo;
-            break;
-        case 2:
-            return Choice::play;
-            break;
-        case 3:
-            return Choice::exit;
-            break;
-        default:
-            return Choice::exit;
-            break;
-    }
+    return utils::convert_choice(choice);
 }
 
 void print_menu(WINDOW *menu_win, const uint highlight)

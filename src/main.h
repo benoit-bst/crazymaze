@@ -7,7 +7,6 @@
 #include "utils.h"
 
 using namespace std;
-using namespace cm;
 
 //------------------------------
 // Main title
@@ -25,11 +24,6 @@ static const string title=R"(
 // Menu Handling
 //-----------------------------
 static const array<string, 3> menu = {"Demo", "Play", "Exit"};
-enum class Choice {
-    demo,
-    play,
-    exit
-};
 
 static constexpr uint menu_width   = 13;
 static constexpr uint menu_height  = 9;
