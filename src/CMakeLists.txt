@@ -4,6 +4,7 @@ project(crazymaze)
 
 set(MAIN_SOURCES
     main.cc
+    utils.cc
 )
 
 # Compil flags

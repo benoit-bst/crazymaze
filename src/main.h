@@ -4,21 +4,10 @@
 #include <locale.h>  // only for sleep()
 #include <iostream>
 
-#include <ncurses.h> // graphic lib for term
-
-#include <maze/maze.h> // maze core lib
+#include "utils.h"
 
 using namespace std;
 using namespace cm;
-
-static constexpr char D_value = 68;
-static constexpr char d_value = 100;
-static constexpr char N_value = 78;
-static constexpr char n_value = 110;
-static constexpr char Q_value = 81;
-static constexpr char q_value = 113;
-
-void convert_char(const char simple_char);
 
 //------------------------------
 // Main title
