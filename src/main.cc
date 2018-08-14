@@ -13,6 +13,23 @@ Choice handle_menu()
     noecho();
     cbreak();   /* Line buffering disabled. pass on everything */
 
+    // color
+    if (has_colors() == FALSE) {
+        endwin();
+        printf("Your terminal does not support color\n");
+        exit(1);
+    }
+
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
+    init_pair(4, COLOR_BLACK, COLOR_BLACK);
+    init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(6, COLOR_CYAN, COLOR_BLACK);
+    init_pair(7, COLOR_BLUE, COLOR_BLACK);
+    init_pair(8, COLOR_MAGENTA, COLOR_BLACK);
+
     // Title
     printw("%s\n", title.c_str());
 
@@ -103,11 +120,17 @@ void demo()
     noecho();
     cbreak();   /* Line buffering disabled. pass on everything */
 
+
     // How to
     printw("\n Welcome to demo\n");
     refresh();
     usleep(500000);
-    printw("\n Choose your maze size\n");
+    printw("\n Choose your maze size,\n");
+    printw(" and find your path little rat...\n");
+    printw(" Move:\n");
+    printw("             Arrow UP\n");
+    printw(" Arrow LEFT            Arrow RIGHT >\n");
+    printw("            Arrow DOWN\n");
 
     const uint width = 51;
     const uint height = 21;
@@ -118,7 +141,7 @@ void demo()
     auto mat = my_maze.matrix();
     for (uint i = 0; i < mat.size(); ++i) {
         if (i % width == 0)
-            printw("\n");
+            printw("\n ");
         convert_char(mat[i]);
     }
     refresh();
@@ -130,33 +153,54 @@ void convert_char(const char simple_char)
 {
     switch (simple_char) {
         case default_value:
+            attron(COLOR_PAIR(4));
             addch(ACS_BULLET);
+            attroff(COLOR_PAIR(4));
             break;
         case empty_value:
-            addch(simple_char);
+            attron(COLOR_PAIR(4));
+            addch(ACS_CKBOARD);
+            attroff(COLOR_PAIR(4));
             break;
         case visited_value:
+            attron(COLOR_PAIR(5));
             addch(ACS_DIAMOND);
+            attroff(COLOR_PAIR(5));
             break;
         case cm::border:
+            attron(COLOR_PAIR(2));
             addch(ACS_CKBOARD);
+            attroff(COLOR_PAIR(2));
             break;
         case cross:
+            attron(COLOR_PAIR(2));
             addch(ACS_PLUS);
+            attroff(COLOR_PAIR(2));
             break;
         case vertical:
+            attron(COLOR_PAIR(2));
             addch(ACS_VLINE);
+            attroff(COLOR_PAIR(2));
             break;
         case horizontal:
+            attron(COLOR_PAIR(2));
             addch(ACS_HLINE);
+            attroff(COLOR_PAIR(2));
             break;
         case input:
-            addch(ACS_PLUS);
+            attron(COLOR_PAIR(3));
+            addch(ACS_CKBOARD);
+            attroff(COLOR_PAIR(3));
             break;
         case output:
-            addch(ACS_PLUS);
+            attron(COLOR_PAIR(3));
+            addch(ACS_CKBOARD);
+            attroff(COLOR_PAIR(3));
             break;
         default:
+            attron(COLOR_PAIR(4));
+            addch(ACS_CKBOARD);
+            attroff(COLOR_PAIR(4));
             break;
     }
 }
