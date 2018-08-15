@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unistd.h>  // only for sleep()
-#include <locale.h>  // only for sleep()
+#include <locale.h>
 #include <iostream>
 
 #include "utils.h"
@@ -21,22 +21,35 @@ static const string title=R"(
                  game)";
 
 //------------------------------
-// Menu Handling
+// Main page
 //-----------------------------
-static const array<string, 3> menu = {"Demo", "Play", "Exit"};
+static constexpr uint main_menu_size = 3;
+static const array<string, main_menu_size> main_menu = {"Demo", "Play", "Exit"};
 
-static constexpr uint menu_width   = 13;
-static constexpr uint menu_height  = 9;
-static constexpr uint menu_start_x = 0;
-static constexpr uint menu_start_y = 12;
+static constexpr uint main_width   = 13;
+static constexpr uint main_height  = 9;
+static constexpr uint main_start_x = 0;
+static constexpr uint main_start_y = 12;
 
-Choice handle_menu();
-void print_menu(WINDOW *menu_win, const uint highlight);
+MainChoice main_page();
 
 //------------------------------
-// Demo
+// Dem3o
 //-----------------------------
 void demo();
+
+//------------------------------
+// play
+//-----------------------------
+static constexpr uint maze_menu_size = 5;
+static const array<string, maze_menu_size> maze_menu = {"Small", "Medium", "Large", "Extra Large", "Exit"};
+
+static constexpr uint maze_width   = 13;
+static constexpr uint maze_height  = 9;
+static constexpr uint maze_start_x = 0;
+static constexpr uint maze_start_y = 2;
+
+void play();
 
 //------------------------------
 // Bye

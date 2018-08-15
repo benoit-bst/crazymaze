@@ -72,22 +72,63 @@ void init_color()
     init_pair(10, COLOR_RED, COLOR_WHITE);
 }
 
-Choice convert_choice(const int choice)
+MainChoice convert_main_choice(const int choice)
 {
     switch (choice) {
         case 1:
-            return Choice::demo;
+            return MainChoice::demo;
             break;
         case 2:
-            return Choice::play;
+            return MainChoice::play;
             break;
         case 3:
-            return Choice::exit;
+            return MainChoice::exit;
             break;
         default:
-            return Choice::exit;
+            return MainChoice::exit;
             break;
     }
+}
+
+MazeChoice convert_maze_choice(const int choice)
+{
+    switch (choice) {
+        case 1:
+            return MazeChoice::small;
+            break;
+        case 2:
+            return MazeChoice::medium;
+            break;
+        case 3:
+            return MazeChoice::large;
+            break;
+        case 4:
+            return MazeChoice::extra_large;
+            break;
+        case 5:
+            return MazeChoice::exit;
+            break;
+        default:
+            return MazeChoice::small;
+            break;
+    }
+}
+
+pair<int, int> convert_maze_size(const MazeChoice maze_choice)
+{
+    switch (maze_choice) {
+        case MazeChoice::small:
+            return make_pair<int, int>(27, 9);
+        case MazeChoice::medium:
+            return make_pair<int, int>(51, 15);
+        case MazeChoice::large:
+            return make_pair<int, int>(81, 27);
+        case MazeChoice::extra_large:
+            return make_pair<int, int>(171, 41);
+        default:
+            return make_pair<int, int>(27, 9);
+    }
+
 }
 
 } // namespace utils

@@ -1,12 +1,7 @@
 #include "main.h"
 
-Choice handle_menu()
+MainChoice main_page()
 {
-    WINDOW *menu_win;
-    uint highlight = 1;
-    int choice = 0;
-    int c;
-
     initscr();
     curs_set(0);
     clear();
@@ -34,67 +29,8 @@ Choice handle_menu()
     refresh();
 
     // Menu
-    menu_win = newwin(menu_height, menu_width, menu_start_y, menu_start_x);
-    keypad(menu_win, TRUE);
-    print_menu(menu_win, highlight);
-
-    // main loop
-    while(1) {
-        c = wgetch(menu_win);
-        switch(c) {
-            case KEY_UP:
-                if(highlight == 1)
-                    highlight = menu.size();
-                else
-                    --highlight;
-                break;
-            case KEY_DOWN:
-                if(highlight == menu.size())
-                    highlight = 1;
-                else
-                    ++highlight;
-                break;
-            case 10:
-                choice = highlight;
-                break;
-            default:
-                mvprintw(24, 0, "Please select and press enter");
-                if (c == 27)
-                    endwin();
-                    exit(1);
-                refresh();
-                break;
-        }
-        print_menu(menu_win, highlight);
-        if(choice != 0) // User did a choice come out of the infinite loop
-            break;
-    }
-    mvprintw(23, 0, "You chose choice %d with choice string %s\n", choice, menu[choice - 1]);
-    clrtoeol();
-    refresh();
-    endwin();
-
-    return utils::convert_choice(choice);
-}
-
-void print_menu(WINDOW *menu_win, const uint highlight)
-{
-    int x, y;
-
-    x = 1;
-    y = 1;
-    //box(menu_win, 0, 0);
-    for(uint i = 0; i < menu.size(); ++i)
-    {   if(highlight == i + 1) /* High light the present choice */
-        {   wattron(menu_win, A_REVERSE);
-            mvwprintw(menu_win, y, x, "%s", menu[i].c_str());
-            wattroff(menu_win, A_REVERSE);
-        }
-        else
-            mvwprintw(menu_win, y, x, "%s", menu[i].c_str());
-        ++y;
-    }
-    wrefresh(menu_win);
+    const uint choice = utils::handle_menu<main_menu_size, MainChoice>(main_menu, main_height, main_width, main_start_y, main_start_x);
+    return utils::convert_main_choice(choice);
 }
 
 void demo()
@@ -134,6 +70,53 @@ void demo()
     endwin();
 }
 
+void play()
+{
+    initscr();
+    clear();
+    noecho();
+    cbreak(); // Line buffering disabled. pass on everything
+
+    // How to
+    attron(COLOR_PAIR(9));
+    printw("\n Select a size\n");
+    attroff(COLOR_PAIR(9));
+    refresh();
+
+    // Menu
+    pair<int, int> maze_size;
+    while (1) {
+        const uint choice = utils::handle_menu<maze_menu_size, MazeChoice>(maze_menu, maze_height, maze_width, maze_start_y, maze_start_x);
+        MazeChoice maze_choice = utils::convert_maze_choice(choice);
+        if (maze_choice == MazeChoice::exit) {
+            endwin();
+            return;
+        }
+        maze_size = utils::convert_maze_size(maze_choice);
+        if ((maze_size.first <= COLS - 1) &&  (maze_size.second <= LINES - 1)) {
+            break;
+        } else {
+            mvprintw(11, 1, "Your terminal is too small for this size...");
+            mvprintw(12, 1, "Please select a smaller size or resize terminal.");
+            refresh();
+        }
+    }
+
+    clear();
+    maze my_maze(maze_size.first, maze_size.second);
+    my_maze.random_maze(maze::dig_maze_algorithm::DFS);
+    auto mat = my_maze.matrix();
+    for (uint i = 0; i < mat.size(); ++i) {
+        if (i % maze_size.first == 0)
+            printw("\n ");
+        utils::convert_char(mat[i]);
+    }
+    refresh();
+    getch();
+    clrtoeol();
+    endwin();
+}
+
 void bye()
 {
     initscr();
@@ -160,22 +143,21 @@ int main()
     while(1) {
 
         // Menu
-        Choice action = handle_menu();
+        MainChoice action = main_page();
 
         switch (action) {
-            case Choice::demo:
+            case MainChoice::demo:
                 demo();
                 break;
-            case Choice::play:
-
+            case MainChoice::play:
+                play();
                 break;
-            case Choice::exit:
+            case MainChoice::exit:
                 bye();
                 return EXIT_SUCCESS;
                 break;
             default:
                 return EXIT_SUCCESS;
-
         }
     }
     return EXIT_SUCCESS;
