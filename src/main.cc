@@ -49,12 +49,12 @@ void demo()
     printw("\n Choose your maze size,\n");
     printw(" and find your path little rat...\n");
     printw(" Move:\n");
-    printw("             Arrow UP\n");
-    printw(" Arrow LEFT            Arrow RIGHT >\n");
-    printw("            Arrow DOWN\n");
+    printw("                 Arrow UP or k\n");
+    printw(" Arrow LEFT or h                 Arrow RIGHT or l\n");
+    printw("                 Arrow DOWN or j\n");
 
-    const uint width = 51;
-    const uint height = 21;
+    const uint width = 47;
+    const uint height = 17;
     maze my_maze(width, height);
 
     my_maze.random_maze(maze::dig_maze_algorithm::DFS);
@@ -100,7 +100,7 @@ void play()
             mvprintw(12, 1, "Please select a smaller size or resize terminal.");
             refresh();
         }
-    }
+    };
 
     clear();
     maze my_maze(maze_size.first, maze_size.second);
@@ -112,7 +112,10 @@ void play()
         utils::convert_char(mat[i]);
     }
     refresh();
-    getch();
+
+    // move cursor
+    utils::move_cursor(my_maze);
+
     clrtoeol();
     endwin();
 }

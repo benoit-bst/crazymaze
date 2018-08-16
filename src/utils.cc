@@ -131,4 +131,87 @@ pair<int, int> convert_maze_size(const MazeChoice maze_choice)
 
 }
 
+bool is_valid(vector<char>& matrix, uint width, uint x, uint y)
+{
+    if (matrix[x*width + y] == cm::empty_value ||
+        matrix[x*width + y] == cm::visited_value)
+        return true;
+    else
+        return false;
+}
+
+void move_cursor(cm::maze& maze)
+{
+    int offset = 1;
+    auto entrance = maze.entrance();
+    auto exit = maze.exit();
+    auto current_position = make_pair<uint, uint>(entrance.first + 0, entrance.second + 1);
+
+    if (is_valid(maze.matrix(), maze.maze_width(), current_position.first, current_position.second)) {
+        attron(COLOR_PAIR(1));
+        mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    } else {
+        return;
+    }
+
+    keypad(stdscr, TRUE);
+    int ch;
+    do {
+        ch = getch();
+
+        switch (ch) {
+            case KEY_UP:
+            case 'k':
+            case 'K':
+                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first - 1, current_position.second + 0)) {
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
+                    current_position.first--;
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+                    refresh();
+                }
+                 break;
+            case KEY_DOWN:
+            case 'j':
+            case 'J':
+                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 1, current_position.second + 0)) {
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
+                    current_position.first++;
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+                    refresh();
+                }
+                 break;
+                break;
+            case KEY_LEFT:
+            case 'h':
+            case 'H':
+                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 0, current_position.second - 1)) {
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
+                    current_position.second--;
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+                    refresh();
+                }
+                break;
+            case KEY_RIGHT:
+            case 'l':
+            case 'L':
+                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 0, current_position.second + 1)) {
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
+                    current_position.second++;
+                    mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+                    refresh();
+                }
+                break;
+        }
+        if ((current_position.first == exit.first) && (current_position.second == exit.second - 1)) {
+            keypad(stdscr, FALSE);
+            return;
+        }
+
+    } while ((ch != 'q') && (ch != 'Q') && (ch != 27));
+
+    keypad(stdscr, FALSE);
+}
+
 } // namespace utils

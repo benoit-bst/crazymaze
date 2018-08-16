@@ -7,7 +7,7 @@
 
 namespace cm {
 
-typedef std::pair<uint32_t, uint32_t> Coord;
+typedef std::pair<uint, uint> Coord;
 
 // Different ascii characters to represent raw maze
 static constexpr char default_value = 46;
