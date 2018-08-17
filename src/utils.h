@@ -33,10 +33,8 @@ void move_cursor(cm::maze& maze);
 template<std::size_t SIZE>
 void print_menu(WINDOW *menu_win, const uint highlight, const array<string, SIZE>& menu)
 {
-    int x, y;
+    uint x = 1, y = 1;
 
-    x = 1;
-    y = 1;
     //box(menu_win, 0, 0);
     for(uint i = 0; i < menu.size(); ++i)
     {   if(highlight == i + 1) /* High light the present choice */
@@ -51,13 +49,17 @@ void print_menu(WINDOW *menu_win, const uint highlight, const array<string, SIZE
     wrefresh(menu_win);
 }
 
-template<std::size_t SIZE, typename T>
-int handle_menu(const array<string, SIZE>& menu, const uint height, const uint width, const uint start_y, const uint start_x)
+template<std::size_t SIZE>
+int handle_menu(const array<string, SIZE>& menu,
+                const uint height,
+                const uint width,
+                const uint start_y,
+                const uint start_x)
 {
     WINDOW *menu_win;
     uint highlight = 1;
-    int choice = 0;
-    int c;
+    uint choice = 0;
+    uint c;
 
     menu_win = newwin(height, width, start_y, start_x);
     keypad(menu_win, TRUE);

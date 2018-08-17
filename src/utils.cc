@@ -128,7 +128,6 @@ pair<int, int> convert_maze_size(const MazeChoice maze_choice)
         default:
             return make_pair<int, int>(27, 9);
     }
-
 }
 
 bool is_valid(vector<char>& matrix, uint width, uint x, uint y)

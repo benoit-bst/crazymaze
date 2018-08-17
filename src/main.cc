@@ -29,7 +29,7 @@ MainChoice main_page()
     refresh();
 
     // Menu
-    const uint choice = utils::handle_menu<main_menu_size, MainChoice>(main_menu, main_height, main_width, main_start_y, main_start_x);
+    const uint choice = utils::handle_menu<main_menu_size>(main_menu, main_height, main_width, main_start_y, main_start_x);
     return utils::convert_main_choice(choice);
 }
 
@@ -83,10 +83,10 @@ void play()
     attroff(COLOR_PAIR(9));
     refresh();
 
-    // Menu
+    // Maze size menu
     pair<int, int> maze_size;
     while (1) {
-        const uint choice = utils::handle_menu<maze_menu_size, MazeChoice>(maze_menu, maze_height, maze_width, maze_start_y, maze_start_x);
+        const uint choice = utils::handle_menu<maze_menu_size>(maze_menu, maze_height, maze_width, maze_start_y, maze_start_x);
         MazeChoice maze_choice = utils::convert_maze_choice(choice);
         if (maze_choice == MazeChoice::exit) {
             endwin();
@@ -102,6 +102,7 @@ void play()
         }
     };
 
+    // Create maze
     clear();
     maze my_maze(maze_size.first, maze_size.second);
     my_maze.random_maze(maze::dig_maze_algorithm::DFS);
@@ -114,7 +115,7 @@ void play()
     printw("\n\n show/mask path [p] - quit [q] [esc]");
     refresh();
 
-    // move cursor
+    // move cursor inside maze
     utils::move_cursor(my_maze);
 
     clrtoeol();
