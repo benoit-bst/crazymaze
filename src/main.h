@@ -34,7 +34,7 @@ static constexpr uint main_start_y = 12;
 MainChoice main_page();
 
 //------------------------------
-// Dem3o
+// Demo
 //-----------------------------
 void demo();
 

@@ -111,6 +111,7 @@ void play()
             printw("\n ");
         utils::convert_char(mat[i]);
     }
+    printw("\n\n show/mask path [p] - quit [q] [esc]");
     refresh();
 
     // move cursor

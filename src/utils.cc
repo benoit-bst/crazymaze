@@ -143,6 +143,8 @@ bool is_valid(vector<char>& matrix, uint width, uint x, uint y)
 void move_cursor(cm::maze& maze)
 {
     int offset = 1;
+    bool show_path = false;
+    queue<Coord> my_path;
     auto entrance = maze.entrance();
     auto exit = maze.exit();
     auto current_position = make_pair<uint, uint>(entrance.first + 0, entrance.second + 1);
@@ -203,8 +205,35 @@ void move_cursor(cm::maze& maze)
                     refresh();
                 }
                 break;
+            case 'p':
+            case 'P':
+                if (show_path == false) {
+                    maze.find_path();
+                    auto mat = maze.matrix();
+                    for (uint i = 0; i < mat.size(); ++i) {
+                        if (mat[i] == visited_value) {
+                            mvaddch(std::floor(i/maze.maze_width()) + offset, (i %  maze.maze_width()) + offset, ACS_BULLET);
+                        }
+                    }
+                    show_path = true;
+                } else {
+                    auto mat = maze.matrix();
+                    for (uint i = 0; i < mat.size(); ++i) {
+                        if (mat[i] == visited_value) {
+                            attron(COLOR_PAIR(4));
+                            mvaddch(std::floor(i/maze.maze_width()) + offset, (i %  maze.maze_width()) + offset, ACS_CKBOARD);
+                            attroff(COLOR_PAIR(4));
+                        }
+                    }
+                    show_path = false;
+                }
+                mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
+                refresh();
+                break;
         }
         if ((current_position.first == exit.first) && (current_position.second == exit.second - 1)) {
+            printw("  You win !!! in secs\n ");
+            getch();
             keypad(stdscr, FALSE);
             return;
         }
