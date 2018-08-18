@@ -25,5 +25,10 @@ add_library(${PROJECT_NAME} STATIC ${MAZE_SOURCES})
 target_include_directories(${PROJECT_NAME} INTERFACE "${maze_SOURCE_DIR}/include")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${CRAZYMAZE_FLAGS})
 
+if (COVERAGE)
+    target_compile_options(maze PRIVATE --coverage)
+    target_link_libraries(maze PRIVATE --coverage)
+endif()
+
 #Tests
 add_subdirectory(tests)
