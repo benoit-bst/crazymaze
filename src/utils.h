@@ -86,9 +86,10 @@ int handle_menu(const array<string, SIZE>& menu,
                 break;
             default:
                 mvprintw(24, 0, "Please select and press enter");
-                if (c == 27)
+                if (c == 27) {
                     endwin();
                     exit(1);
+                }
                 refresh();
                 break;
         }
