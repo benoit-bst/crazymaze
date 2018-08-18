@@ -1,6 +1,6 @@
 [submodule "src/maze/tests/gtest"]
 	path = src/maze/tests/gtest
-	url = git@github.com:google/googletest.git
+	url = https://github.com/google/googletest.git
 [submodule "src/maze/third_party/termcolor"]
 	path = src/maze/third_party/termcolor
-	url = git@github.com:ikalnytskyi/termcolor.git
+	url = https://github.com/ikalnytskyi/termcolor.git
