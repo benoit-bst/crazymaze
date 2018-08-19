@@ -16,8 +16,17 @@ TEST(maze_generator_tests, print_maze){
 
     // N and M have to be odd
     maze my_maze(N, M);
+    ASSERT_EQ(N, my_maze.maze_width());
+    ASSERT_EQ(M, my_maze.maze_height());
+    ASSERT_EQ(0, my_maze.entrance().first);
+    ASSERT_EQ(0, my_maze.entrance().second);
+    ASSERT_EQ(0, my_maze.exit().first);
+    ASSERT_EQ(0, my_maze.exit().second);
 
     my_maze.random_maze(maze::dig_maze_algorithm::DFS);
+
+    auto matrix = my_maze.matrix();
+
     // Print with ascii characters
     my_maze.print_maze();
     std::cout << "\n";
@@ -81,9 +90,6 @@ TEST(find_path_tests, repeat_find_path){
             ASSERT_EQ(my_maze.is_path(), false);
             bool is_path = my_maze.find_path();
             ASSERT_EQ(is_path, true);
-            if (is_path == false) {
-                my_maze.print_maze();
-            }
             my_maze.clean_path();
         }
     }

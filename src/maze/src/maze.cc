@@ -16,6 +16,8 @@ maze::maze(const uint width, const uint height)
   _ddy({0, 1, 0, -1}),
   _width(width),
   _height(height),
+  _entrance(0,0),
+  _exit(0,0),
   _is_path(false)
 {
     assert((width % 2) != 0 && "width need to be odd");
@@ -70,14 +72,14 @@ void maze::random_maze(const dig_maze_algorithm dma)
  */
 bool maze::find_path(const shortest_path_algorithm spa)
 {
+    bool is_finded = false;
     switch (spa) {
         case shortest_path_algorithm::BFS:
-            return breadth_first_search_algorithm();
+            is_finded =  breadth_first_search_algorithm();
         case shortest_path_algorithm::AS:
-            return a_star_algorithm();
-        default:
-            return breadth_first_search_algorithm();
+            is_finded =  a_star_algorithm();
     }
+    return is_finded;
 }
 
 /**
@@ -263,8 +265,6 @@ void maze::dig_maze(const uint start_x, const uint start_y, const dig_maze_algor
         case dig_maze_algorithm::DFS:
             deep_first_search_algorithm(start_x, start_y);
             break;
-        default:
-            deep_first_search_algorithm(start_x, start_y);
     }
 }
 
