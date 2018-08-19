@@ -76,8 +76,10 @@ bool maze::find_path(const shortest_path_algorithm spa)
     switch (spa) {
         case shortest_path_algorithm::BFS:
             is_finded =  breadth_first_search_algorithm();
+            break;
         case shortest_path_algorithm::AS:
             is_finded =  a_star_algorithm();
+            break;
     }
     return is_finded;
 }
