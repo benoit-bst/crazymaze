@@ -130,10 +130,11 @@ pair<int, int> convert_maze_size(const MazeChoice maze_choice)
     }
 }
 
-bool is_valid(vector<char>& matrix, uint width, uint x, uint y)
+bool is_valid(cm::maze& maze, uint x, uint y)
 {
-    if (matrix[x*width + y] == cm::empty_value ||
-        matrix[x*width + y] == cm::visited_value)
+    auto& matrix = maze.matrix();
+    if (matrix[maze.convert_coords(x, y)] == cm::empty_value ||
+        matrix[maze.convert_coords(x, y)] == cm::visited_value)
         return true;
     else
         return false;
@@ -148,7 +149,7 @@ void move_cursor(cm::maze& maze)
     auto exit = maze.exit();
     auto current_position = make_pair<uint, uint>(entrance.first + 0, entrance.second + 1);
 
-    if (is_valid(maze.matrix(), maze.maze_width(), current_position.first, current_position.second)) {
+    if (is_valid(maze, current_position.first, current_position.second)) {
         attron(COLOR_PAIR(1));
         mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
         attroff(COLOR_PAIR(1));
@@ -166,7 +167,7 @@ void move_cursor(cm::maze& maze)
             case KEY_UP:
             case 'k':
             case 'K':
-                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first - 1, current_position.second + 0)) {
+                if (is_valid(maze, current_position.first - 1, current_position.second + 0)) {
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
                     current_position.first--;
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
@@ -176,7 +177,7 @@ void move_cursor(cm::maze& maze)
             case KEY_DOWN:
             case 'j':
             case 'J':
-                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 1, current_position.second + 0)) {
+                if (is_valid(maze,  current_position.first + 1, current_position.second + 0)) {
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
                     current_position.first++;
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
@@ -187,7 +188,7 @@ void move_cursor(cm::maze& maze)
             case KEY_LEFT:
             case 'h':
             case 'H':
-                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 0, current_position.second - 1)) {
+                if (is_valid(maze, current_position.first + 0, current_position.second - 1)) {
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
                     current_position.second--;
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
@@ -197,7 +198,7 @@ void move_cursor(cm::maze& maze)
             case KEY_RIGHT:
             case 'l':
             case 'L':
-                if (is_valid(maze.matrix(), maze.maze_width(), current_position.first + 0, current_position.second + 1)) {
+                if (is_valid(maze, current_position.first + 0, current_position.second + 1)) {
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_DIAMOND);
                     current_position.second++;
                     mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);

@@ -81,6 +81,8 @@ public:
     void print_maze(const printing_type type = printing_type::ascii);
     vector<char>& matrix();
 
+    uint convert_coords(const uint x, const uint y);
+
     maze(const maze &) = delete;
     maze& operator=(const maze &) = delete;
 
@@ -109,7 +111,6 @@ private:
     void initialize_flat_matrix();
     bool create_random_doors();
     bool is_valid(const uint x, const uint y);
-    uint convert_coords(const uint x, const uint y);
 
     void dig_maze(const uint start_x, const uint start_y,
                   const dig_maze_algorithm dma = dig_maze_algorithm::DFS);

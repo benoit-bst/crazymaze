@@ -167,6 +167,18 @@ vector<char>& maze::matrix()
 }
 
 /**
+ * @brief Convert coords for flat matrix
+ *
+ * @param x For height
+ * @param y For width
+ */
+uint maze::convert_coords(const uint x, const uint y)
+{
+    return x*_width + y;
+}
+
+
+/**
  * @brief Create full initial maze
  */
 void maze::initialize_flat_matrix()
@@ -239,17 +251,6 @@ bool maze::create_random_doors()
 bool maze::is_valid(const uint x, const uint y)
 {
    return (x > 0) && (x < _height) && (y > 0) && (y < _width);
-}
-
-/**
- * @brief Convert coords for flat matrix
- *
- * @param x For height
- * @param y For width
- */
-uint maze::convert_coords(const uint x, const uint y)
-{
-    return x*_width + y;
 }
 
 /**

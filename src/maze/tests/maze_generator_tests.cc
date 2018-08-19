@@ -18,6 +18,9 @@ TEST(maze_generator_tests, print_maze){
     maze my_maze(N, M);
     ASSERT_EQ(N, my_maze.maze_width());
     ASSERT_EQ(M, my_maze.maze_height());
+
+    // When maze is not digged,
+    // entrance and exit are on {0,0} corrds
     ASSERT_EQ(0, my_maze.entrance().first);
     ASSERT_EQ(0, my_maze.entrance().second);
     ASSERT_EQ(0, my_maze.exit().first);
@@ -26,6 +29,9 @@ TEST(maze_generator_tests, print_maze){
     my_maze.random_maze(maze::dig_maze_algorithm::DFS);
 
     auto matrix = my_maze.matrix();
+
+    // in flat matrix {1,1} is equal to 102
+    ASSERT_EQ(102, my_maze.convert_coords(1,1));
 
     // Print with ascii characters
     my_maze.print_maze();
