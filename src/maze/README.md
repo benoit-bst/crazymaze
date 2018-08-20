@@ -3,10 +3,10 @@
 Contains all algorithms to handle maze :
 
 - A Dethp-First Search algorithm to randomly dig the maze (recursive or not).
-- Finding shortest path algorithm with Breadth-first search algorithm.
+- Find the shortest path algorithm with Breadth-first search algorithm.
+- Method to print, clean, etc...
 
-The internal matrix container is **Cache friendly**. Maze matrix is a vector (Flat matrix).
-Associated tests inside the lib.
+The internal matrix container is **Cache friendly** (With a vector).\
 
 ## Todo
 
@@ -21,3 +21,4 @@ add_subdirectory(maze)
 include_directories(${maze_header_dir})
 include_directories(${termcolor_SOURCE_DIR}/include)
 ```
+
