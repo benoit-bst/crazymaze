@@ -5,12 +5,10 @@ Find path like **a rat** in a random maze.
 ## Introduction
 
 Crazy Maze is simple game within the term in **C++11**. The game is based on **ncurses** library to manage the interface.\
-We can play within differents maze size.\
-A demo is available.\
+We can play within differents maze size (small, medium, large, extra large).\
+Use Arrow Key to move.\
 
-[main menu](menu.png)
-
-[maze](maze_example.png)
+![maze](maze.png)
 
 ## The Core library
 
