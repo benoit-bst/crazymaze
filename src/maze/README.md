@@ -6,7 +6,7 @@ Contains all algorithms to handle maze :
 - Find the shortest path algorithm with Breadth-first search algorithm.
 - Method to print, clean, etc...
 
-The internal matrix container is **Cache friendly** (With a vector).\
+The internal matrix container is **Cache friendly** (With a vector) to speed up computing.
 
 ## Todo
 
