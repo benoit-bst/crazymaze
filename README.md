@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/benoit-bst/crazymaze.svg?branch=master)](https://travis-ci.org/benoit-bst/crazymaze)
+
 # Crazy Maze
 
 Find path like **a rat** in a random maze.
@@ -11,6 +13,8 @@ Use Arrow Key to move.
 ![maze](maze.png)
 
 ## The Core library
+
+[![Coverage Status](https://coveralls.io/repos/github/benoit-bst/crazymaze/badge.svg?branch=master)](https://coveralls.io/github/benoit-bst/crazymaze?branch=master)
 
 The game is based on a [maze core library](https://github.com/benoit-bst/crazymaze/tree/master/src/maze) in c++11.\
 The library contains :
