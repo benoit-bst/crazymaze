@@ -103,20 +103,23 @@ void play()
     };
 
     // Create maze
-    clear();
-    maze my_maze(maze_size.first, maze_size.second);
-    my_maze.random_maze(maze::dig_maze_algorithm::DFS);
-    auto mat = my_maze.matrix();
-    for (uint i = 0; i < mat.size(); ++i) {
-        if (i % maze_size.first == 0)
-            printw("\n ");
-        utils::convert_char(mat[i]);
-    }
-    printw("\n\n show/mask path [p] - quit [q] [esc]");
-    refresh();
+    bool restart = true;
+    while(restart) {
+        clear();
+        maze my_maze(maze_size.first, maze_size.second);
+        my_maze.random_maze(maze::dig_maze_algorithm::DFS);
+        auto mat = my_maze.matrix();
+        for (uint i = 0; i < mat.size(); ++i) {
+            if (i % maze_size.first == 0)
+                printw("\n ");
+            utils::convert_char(mat[i]);
+        }
+        printw("\n\n show/mask path [p] - quit [q] [esc] - new [n]");
+        refresh();
 
-    // move cursor inside maze
-    utils::move_cursor(my_maze);
+        // move cursor inside maze
+        restart = utils::move_cursor(my_maze);
+    }
 
     clrtoeol();
     endwin();

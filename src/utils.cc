@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <chrono>
 
 namespace utils {
 
@@ -140,7 +141,7 @@ bool is_valid(cm::maze& maze, uint x, uint y)
         return false;
 }
 
-void move_cursor(cm::maze& maze)
+bool move_cursor(cm::maze& maze)
 {
     int offset = 1;
     bool show_path = false;
@@ -149,13 +150,16 @@ void move_cursor(cm::maze& maze)
     auto exit = maze.exit();
     auto current_position = make_pair<uint, uint>(entrance.first + 0, entrance.second + 1);
 
+    // Start time
+    auto t1 = std::chrono::high_resolution_clock::now();
+
     if (is_valid(maze, current_position.first, current_position.second)) {
         attron(COLOR_PAIR(1));
         mvaddch(current_position.first + offset, current_position.second + offset, ACS_CKBOARD);
         attroff(COLOR_PAIR(1));
         refresh();
     } else {
-        return;
+        return false;
     }
 
     keypad(stdscr, TRUE);
@@ -205,6 +209,10 @@ void move_cursor(cm::maze& maze)
                     refresh();
                 }
                 break;
+            case 'n':
+            case 'N':
+                return true;
+                break;
             case 'p':
             case 'P':
                 if (show_path == false) {
@@ -232,15 +240,18 @@ void move_cursor(cm::maze& maze)
                 break;
         }
         if ((current_position.first == exit.first) && (current_position.second == exit.second - 1)) {
-            printw("  You win !!! in secs\n ");
+            auto t2 = std::chrono::high_resolution_clock::now();
+            auto int_ms = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
+            printw("  You win !!! %d in secs\n ", int_ms);
             getch();
             keypad(stdscr, FALSE);
-            return;
+            return false;
         }
 
     } while ((ch != 'q') && (ch != 'Q') && (ch != 27));
 
     keypad(stdscr, FALSE);
+    return false;
 }
 
 } // namespace utils

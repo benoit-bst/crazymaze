@@ -28,7 +28,7 @@ MainChoice convert_main_choice(const int choice);
 MazeChoice convert_maze_choice(const int choice);
 pair<int, int> convert_maze_size(const MazeChoice maze_choice);
 bool is_valid(vector<char>& matrix, uint width, uint x, uint y);
-void move_cursor(cm::maze& maze);
+bool move_cursor(cm::maze& maze);
 
 template<std::size_t SIZE>
 void print_menu(WINDOW *menu_win, const uint highlight, const array<string, SIZE>& menu)
