@@ -19,8 +19,8 @@ Using Arrow Key to move.
 The game is based on a [maze core library](https://github.com/benoit-bst/crazymaze/tree/master/src/maze) in c++11.\
 The library contains :
 
-- A Dethp-First Search algorithm to randomly dig the maze.
-- Finding shortest path algorithm with BFS algorithm.
+- A Depth-First Search algorithm to randomly dig the maze.
+- A finding shortest path algorithm method with BFS algorithm.
 - A Printing method
 
 ## Debian installation
