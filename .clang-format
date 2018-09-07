@@ -1,0 +1,40 @@
+# Tested on: clang-format version 3.8.0
+
+# Common settings
+BasedOnStyle: LLVM
+TabWidth:     4
+IndentWidth:  4
+ColumnLimit:  113
+
+---
+Language: Cpp
+
+# Force pointers to the type for C++.
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# Align
+AlignAfterOpenBracket: true
+AlignConsecutiveAssignments: true
+AlignEscapedNewlinesLeft: true
+AlignOperands: true
+AlignTrailingComments: true
+
+# Short representation
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+
+# Break
+BreakBeforeBraces: Linux
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: true
+BreakConstructorInitializersBeforeComma: true
+
+BinPackArguments: false
+BinPackParameters: false
+
+---

@@ -1,0 +1,2 @@
+^src/maze/third_party/termcolor/.*
+^src/maze/test/gtest/.*

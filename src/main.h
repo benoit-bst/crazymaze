@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unistd.h>  // only for sleep()
-#include <locale.h>
 #include <iostream>
+#include <locale.h>
+#include <unistd.h> // only for sleep()
 
 #include "utils.h"
 
@@ -11,7 +11,7 @@ using namespace std;
 //------------------------------
 // Main title
 //-----------------------------
-static const string title=R"(
+static const string title = R"(
               Welcome to
   __ _ _ __ _ ____  _   _ __  __ _ ______
  / _| '_/ _` |_ / || | | '  \/ _` |_ / -_)
@@ -54,7 +54,7 @@ void play();
 //------------------------------
 // Bye
 //-----------------------------
-static const string bye_little_rat=R"(
+static const string bye_little_rat = R"(
 
                  _..----.._    _
                .'  .--.    "-.(0)_
@@ -63,4 +63,3 @@ static const string bye_little_rat=R"(
 
    Bye little Rat)";
 void bye();
-

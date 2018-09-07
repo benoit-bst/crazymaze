@@ -12,7 +12,8 @@ static constexpr int M = 31;
 /*
  Printing maze
 */
-TEST(maze_generator_tests, print_maze){
+TEST(maze_generator_tests, print_maze)
+{
 
     // N and M have to be odd
     maze my_maze(N, M);
@@ -31,7 +32,7 @@ TEST(maze_generator_tests, print_maze){
     auto matrix = my_maze.matrix();
 
     // in flat matrix {1,1} is equal to 102
-    ASSERT_EQ(102, my_maze.convert_coords(1,1));
+    ASSERT_EQ(102, my_maze.convert_coords(1, 1));
 
     // Print with ascii characters
     my_maze.print_maze();
@@ -44,24 +45,23 @@ TEST(maze_generator_tests, print_maze){
 /*
  Repeat maze creation
 */
-TEST(maze_generator_tests, repeat_generator){
+TEST(maze_generator_tests, repeat_generator)
+{
 
     // N and M have to be odd.
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
+    array<maze::dig_maze_algorithm, 2> dma{maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
 
-    for (const auto & a: dma) {
+    for (const auto& a : dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {
 
             // N and M have to be odd
             uint N = common::random_number(5, 50);
-            if (N % 2 == 0)
-                N--;
+            if (N % 2 == 0) N--;
             uint M = common::random_number(5, 50);
-            if (M % 2 == 0)
-                M--;
+            if (M % 2 == 0) M--;
             maze my_maze(N, M);
             my_maze.random_maze(a);
         }
@@ -71,26 +71,25 @@ TEST(maze_generator_tests, repeat_generator){
 /*
  Repeat finding algorithm
 */
-TEST(find_path_tests, repeat_find_path){
+TEST(find_path_tests, repeat_find_path)
+{
 
     // N and M have to be odd.
     // warning, RBA is a recursive function,
     // so be carefull with the stack...
 
-    array<maze::dig_maze_algorithm, 2> dma {maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
+    array<maze::dig_maze_algorithm, 2> dma{maze::dig_maze_algorithm::RDFS, maze::dig_maze_algorithm::DFS};
 
-    for (const auto & a: dma) {
+    for (const auto& a : dma) {
         for (size_t i = 0; i < NB_PASS; ++i) {
 
             // N and M have to be odd.
             // warning, RBA is a recursive function,
             // so be carefull with the stack...
             uint N = common::random_number(5, 50);
-            if (N % 2 == 0)
-                N--;
+            if (N % 2 == 0) N--;
             uint M = common::random_number(5, 50);
-            if (M % 2 == 0)
-                M--;
+            if (M % 2 == 0) M--;
             maze my_maze(N, M);
             my_maze.random_maze(a);
             ASSERT_EQ(my_maze.is_path(), false);
@@ -104,7 +103,8 @@ TEST(find_path_tests, repeat_find_path){
 /*
  find_path tests
 */
-TEST(find_path_tests, find_path){
+TEST(find_path_tests, find_path)
+{
 
     {
         // N and M have to be odd
@@ -127,8 +127,8 @@ TEST(find_path_tests, find_path){
     }
 }
 
-int main(int argc, char **argv){
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
